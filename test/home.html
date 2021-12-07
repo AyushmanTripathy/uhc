@@ -1,0 +1,21 @@
+<main>
+  <img src="./profile.png" alt="profile pic" />
+  <h1>Ayushman Tripathy</h1>
+  <h3>Javascript | Linux | Minimalism</h3>
+</main>
+
+<style>
+  main {
+    @include flex(column);
+    @include flex-center;
+    @include no-padding-margin;
+    @include fixed;
+    @include fullscreen;
+    @include color-scheme;
+    z-index: 0;
+  }
+  img {
+    height: 20vh;
+    aspect-ratio: 1;
+  }
+</style>

@@ -1,0 +1,12 @@
+{
+  "src_dir": "src",
+  "build_dir": "public",
+  "css": {
+    "autoprefix": true,
+    "prefix": "",
+    "scss": {
+      "enabled": true,
+      "source_map":true
+    }
+  }
+}

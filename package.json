@@ -1,0 +1,24 @@
+{
+  "name": "uhc",
+  "version": "1.0.0",
+  "description": "a useful html compiler",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "uhc": "src/index.js"
+  },
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "test": "uhc"
+  },
+  "author": "Ayushman Tripathy",
+  "keywords": [
+    "html",
+    "compiler"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "btss": "^1.0.0",
+    "node-cmd": "^5.0.0"
+  }
+}

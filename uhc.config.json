@@ -1,0 +1,12 @@
+{
+  "src_dir": "test",
+  "build_dir": "build",
+  "css": {
+    "autoprefix": true,
+    "prefix": "@import \"./mixins.scss\";",
+    "scss": {
+      "enabled": true,
+      "source_map": true
+    }
+  }
+}
