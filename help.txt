@@ -3,7 +3,7 @@ UHC (the useful html compiler)
 
 options
   -h : help
-  -gc : generate uhc.config.json
+  -g : generate uhc.config.json
   -c : load config
 
 plz create an issue to report any bugs

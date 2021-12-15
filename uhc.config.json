@@ -6,7 +6,10 @@
     "prefix": "@import \"./mixins.scss\";",
     "scss": {
       "enabled": true,
-      "source_map": true
+      "source_map": false 
     }
+  },
+  "vars": {
+    "foo": "bar"
   }
 }

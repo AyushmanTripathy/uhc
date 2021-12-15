@@ -1,24 +1,8 @@
-NOTICE
-------
-use path relative
-
 DONE
 ----
-publish 1.0.0
-importing html components
-scss support
-help function
-css support
-vars
 
 TODO
 ----
-change $ => ${}
 
-file.match returning null error
-  function : parseIndex
 write docs
 autoprefixer
-
-
-choose a diffrent name and publish
