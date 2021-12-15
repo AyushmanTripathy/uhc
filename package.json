@@ -1,6 +1,6 @@
 {
   "name": "uhc",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "a useful html compiler",
   "main": "src/index.js",
   "type": "module",
