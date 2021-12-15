@@ -8,8 +8,10 @@ error(){
 echo '1. update docs'
 echo '2. reflected changes in todo.txt'
 echo '3. changed hhc.config.json.swp'
-echo '4. commited version code'
+echo '4. change CHANGELOG.md'
 echo 'confirm pusblish?'
+read null
+echo 'commit version code'
 read null
 
 update-npm

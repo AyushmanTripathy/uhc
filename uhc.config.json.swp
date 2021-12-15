@@ -3,10 +3,13 @@
   "build_dir": "public",
   "css": {
     "autoprefix": true,
-    "prefix": "",
+    "prefix": "@import \"./global.scss\";",
     "scss": {
       "enabled": true,
-      "source_map":true
+      "source_map": true
     }
+  },
+  "vars": {
+    "foo": "bar"
   }
 }

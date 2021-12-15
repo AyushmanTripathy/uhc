@@ -1,37 +1,35 @@
-# hhc
+# UHC
 
-#### a helpful html compiler
+## (useful html compiler)
 
-install - `npm i hhc -g`
-usage - `hhc input.html output.html`
+## Configs
 
-why hhc?
-
-- write your familiar html just with additional features
-- import html components
-
-```html
-<import path="./file" foo="bar" />
+```json
+{
+  "src_dir": "src",
+  "build_dir": "public",
+  "css": {
+    "autoprefix": true,
+    "prefix": "@import \"./global.scss\";",
+    "scss": {
+      "enabled": true,
+      "source_map": true
+    }
+  },
+  "vars": {
+    "foo": "bar"
+  }
+}
 ```
 
-- use vars passed to the components
+## options
 
-```html
-<p>hello $foo</p>
-```
+| option | function                 |
+| ------ | ------------------------ |
+| h      | help                     |
+| g      | generate uhc.config.json |
+| c      | load config              |
 
-- no need to make up class names.
+plz create an [issue](https://github.com/AyushmanTripathy/uhc/issues) to report any **bugs** or recommend us **features** we should add.
 
-```html
-<style>         |  <style>
-p {             | p.hhc1 {
-}               | }
-</style>        | </style>
-<p> hello </p>  | <p class="hhc1"> hello </p>
-```
-
-- multi line comments we enjoy!
-
-```js
-/* comment */
-```
+#### thank you for using uhc
