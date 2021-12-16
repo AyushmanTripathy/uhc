@@ -4,8 +4,11 @@ import { red } from "btss";
 import { resolve } from "path";
 import { readFileSync, writeFile, existsSync } from "fs";
 import parseIndex from "./parser.js";
-import cmd from "node-cmd";
 import { promisify } from "util";
+
+import sass from "sass";
+import postcss from "postcss";
+import autoprefixer from "autoprefixer";
 
 globalThis.hash_no = 0;
 globalThis.log = (str) => console.log(str);
@@ -13,8 +16,6 @@ globalThis.error = (str) => {
   console.log(red("[ERROR] ") + str);
   process.exit(1);
 };
-
-const exec = promisify(cmd.run);
 
 try {
   init();
@@ -43,7 +44,7 @@ function init() {
   if (!existsSync(config_path))
     error(
       config_path +
-        " doesn't exists. use -gc to generate config file or use -c to link your config file"
+        " doesn't exists. use -g to generate config file or use -c to link your config file"
     );
 
   globalThis.config = JSON.parse(readFileSync(config_path));
@@ -59,23 +60,23 @@ function init() {
 async function compile() {
   let [html, css] = parseIndex(src + "/index.html");
 
-  let css_output = build + "/bundle" + (config.css.scss ? ".scss" : ".css");
   if (config.css) {
     css = css.replaceAll(/<\/style.*>/g, "");
     css = css.replaceAll(/<style(.||\n)[^>]*>/g, "");
     if (config.css.prefix) css = config.css.prefix + css;
-    write(css, css_output);
   } else error("css configs not found");
 
-  //scss
-  if (config.css.scss)
-    exec(
-      `sass ${css_output} ${build + "/bundle.css"} ${
-        config.css.scss.source_map ? "" : "--no-source-map"
-      } --load-path="${src}"`
-    );
+  // sass
+  const result = sass.compileString(css, {
+    loadPaths: [src],
+  });
 
-  //autoprefixer
+  // postcss
+  postcss([autoprefixer])
+    .process(result.css, { from: "bundle.scss" })
+    .then((res) => {
+      write(result.css, build + "/bundle.css");
+    });
 
   //html
   write(

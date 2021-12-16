@@ -1,6 +1,23 @@
 # UHC
 
-## (useful html compiler)
+#### (useful html compiler)
+
+why?
+
+- importing components
+
+```html
+<import path="./component.html" foo="bar" />
+```
+
+- variables
+
+```html
+<p>hello ${foo}</p>
+```
+
+- sass support
+- `/**/` comments
 
 ## Configs
 

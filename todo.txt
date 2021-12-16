@@ -4,5 +4,8 @@ DONE
 TODO
 ----
 
+postcss
+stylelint
 write docs
 autoprefixer
+routing
