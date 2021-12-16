@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 
-import { red } from "btss";
+import { red, green } from "btss";
 import { resolve } from "path";
-import { readFileSync, writeFile, existsSync } from "fs";
+import { readFileSync, writeFile, watch, existsSync } from "fs";
 import parseIndex from "./parser.js";
-import { promisify } from "util";
 
 import sass from "sass";
 import postcss from "postcss";
@@ -14,6 +13,7 @@ globalThis.hash_no = 0;
 globalThis.log = (str) => console.log(str);
 globalThis.error = (str) => {
   console.log(red("[ERROR] ") + str);
+  console.log("terminating compilation...");
   process.exit(1);
 };
 
@@ -23,19 +23,41 @@ try {
   error(e.message);
 }
 
-function init() {
-  const { words, options } = checkArgs(process.argv.splice(2));
+function watchDir(path) {
+  globalThis.watch_delay = false;
+
+  watch(path, (eventType, filename) => {
+    if (!watch_delay) {
+      log(green("Change dectected..."));
+
+      init(true);
+      globalThis.watch_delay = true;
+      setTimeout(() => {
+        globalThis.watch_delay = false;
+      }, 50);
+    }
+  });
+}
+
+function init(watch) {
   let config_path = "uhc.config.json";
 
-  for (const option in options) {
-    switch (option) {
-      case "g":
-        return generateConfig();
-      case "c":
-        config_path = options[option] == true ? config_path : options[option];
-        break;
-      case "h":
-        return help();
+  if (!watch) {
+    const { words, options } = checkArgs(process.argv.splice(2));
+    for (const option in options) {
+      switch (option) {
+        case "g":
+          return generateConfig();
+        case "c":
+          config_path =
+            options[option] == true ? config_path : options[option];
+          break;
+        case "w":
+          if (options[option] == true) error("watch path required");
+          return watchDir(options[option]);
+        case "h":
+          return help();
+      }
     }
   }
 
@@ -67,15 +89,19 @@ async function compile() {
   } else error("css configs not found");
 
   // sass
-  const result = sass.compileString(css, {
+  const sass_output = sass.compileString(css, {
     loadPaths: [src],
   });
 
+  const plugins = [];
+  if (config.css.autoprefix) plugins.push(autoprefixer);
+
   // postcss
-  postcss([autoprefixer])
-    .process(result.css, { from: "bundle.scss" })
+  postcss(plugins)
+    .process(sass_output.css, { from: "bundle.css" })
     .then((res) => {
-      write(result.css, build + "/bundle.css");
+      write(res.css, build + "/bundle.css");
+      if (res.map) write(res.map, build + "/bundle.css.map");
     });
 
   //html

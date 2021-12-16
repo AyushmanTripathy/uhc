@@ -1,5 +1,13 @@
 # CHANGELOG FOR UHC
 
+## 1.2.0
+
+#### CHANGES
+
+- watch mode
+- postcss
+- autoprefixer
+
 ## 1.1.0
 
 #### CHANGES

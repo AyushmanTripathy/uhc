@@ -16,10 +16,14 @@ why?
 <p>hello ${foo}</p>
 ```
 
-- sass support
+- don't waste time on multiple configs just one, uhc.config.json.
+- install just one package, no need to manage plugins.
+- sass && postcss support.
 - `/**/` comments
 
 ## Configs
+
+**uhc.config.json**
 
 ```json
 {

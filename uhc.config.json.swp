@@ -5,8 +5,7 @@
     "autoprefix": true,
     "prefix": "@import \"./global.scss\";",
     "scss": {
-      "enabled": true,
-      "source_map": true
+      "enabled": true
     }
   },
   "vars": {
