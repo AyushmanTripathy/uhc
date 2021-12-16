@@ -2,7 +2,7 @@
 
 import { red, green } from "btss";
 import { resolve } from "path";
-import { readFileSync, writeFile, watch, existsSync } from "fs";
+import { readFileSync, writeFile, watch, mkdirSync, existsSync } from "fs";
 import parseIndex from "./parser.js";
 
 import sass from "sass";
@@ -11,6 +11,10 @@ import autoprefixer from "autoprefixer";
 
 globalThis.hash_no = 0;
 globalThis.log = (str) => console.log(str);
+globalThis.hash = () => {
+  hash_no += 1;
+  return hash_no;
+};
 globalThis.error = (str) => {
   console.log(red("[ERROR] ") + str);
   console.log("terminating compilation...");
@@ -26,7 +30,7 @@ try {
 function watchDir(path) {
   globalThis.watch_delay = false;
 
-  watch(path, (eventType, filename) => {
+  watch(path, () => {
     if (!watch_delay) {
       log(green("Change dectected..."));
 
@@ -39,7 +43,7 @@ function watchDir(path) {
   });
 }
 
-function init(watch) {
+async function init(watch) {
   let config_path = "uhc.config.json";
 
   if (!watch) {
@@ -73,14 +77,37 @@ function init(watch) {
 
   if (!config.src_dir) error("src dir not specified!");
   if (!config.build_dir) error("build dir not specified!");
-
   globalThis.src = resolve(config_path, "../" + config.src_dir);
   globalThis.build = resolve(config_path, "../" + config.build_dir);
-  compile();
+
+  compile(config.routes);
 }
 
-async function compile() {
-  let [html, css] = parseIndex(src + "/index.html");
+async function compile(routes, dir_path = "") {
+  for (let route in routes) {
+    switch (typeof routes[route]) {
+      case "string":
+        const input_file = routes[route];
+        if (route.startsWith("/")) route = route.slice(1);
+        if (!route) route = "index.html";
+        if (!route.endsWith(".html")) route += ".html";
+
+        const from = resolve(config.src_dir, input_file);
+        const to = resolve(config.build_dir, dir_path + route);
+        await compileRoute(from, to);
+        break;
+      case "object":
+        // check for dir
+        const dir = resolve(config.build_dir, dir_path + route + "/");
+        if (!existsSync(dir)) mkdirSync(dir);
+        await compile(routes[route], dir_path + route + "/");
+        break;
+    }
+  }
+}
+
+async function compileRoute(from, to) {
+  let [html, css] = parseIndex(from);
 
   if (config.css) {
     css = css.replaceAll(/<\/style.*>/g, "");
@@ -88,6 +115,17 @@ async function compile() {
     if (config.css.prefix) css = config.css.prefix + css;
   } else error("css configs not found");
 
+  const id = "/bundle" + hash();
+  //html
+  write(
+    html.replace(
+      /<\/head\s*>/,
+      `<link rel="stylesheet" href=".` + id + `.css"/></head>`
+    ),
+    to
+  );
+
+  to = resolve(to, "../");
   // sass
   const sass_output = sass.compileString(css, {
     loadPaths: [src],
@@ -97,21 +135,12 @@ async function compile() {
   if (config.css.autoprefix) plugins.push(autoprefixer);
 
   // postcss
-  postcss(plugins)
-    .process(sass_output.css, { from: "bundle.css" })
+  await postcss(plugins)
+    .process(sass_output.css, { from: id.slice(1) })
     .then((res) => {
-      write(res.css, build + "/bundle.css");
-      if (res.map) write(res.map, build + "/bundle.css.map");
+      write(res.css, to + id + ".css");
+      if (res.map) write(res.map, to + id + ".css.map");
     });
-
-  //html
-  write(
-    html.replace(
-      /<\/head\s*>/,
-      `<link rel="stylesheet" href="./bundle.css"/></head>`
-    ),
-    build + "/index.html"
-  );
 }
 
 function write(content, path, isNotRelative) {

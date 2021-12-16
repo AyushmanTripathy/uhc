@@ -123,7 +123,3 @@ function path(path) {
   path = path.endsWith(".html") ? path : path + ".html";
   return resolve(src, path);
 }
-function hash() {
-  globalThis.hash_no += 1;
-  return globalThis.hash_no;
-}

@@ -4,13 +4,14 @@
   "css": {
     "autoprefix": true,
     "prefix": "@import \"./mixins.scss\";",
-    "stylelint": true,
     "scss": {
-      "enabled": true,
-      "source_map": true
+      "enabled": true
     }
   },
   "vars": {
     "foo": "bar"
+  },
+  "routes": {
+    "/": "index.html"
   }
 }

@@ -10,5 +10,12 @@
   },
   "vars": {
     "foo": "bar"
+  },
+  "routes": {
+    "/": "index.html",
+    "about": {
+      "/": "about.html",
+      "edit": "edit.html"
+    }
   }
 }
