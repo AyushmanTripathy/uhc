@@ -33,8 +33,7 @@ why?
     "autoprefix": true,
     "prefix": "@import \"./global.scss\";",
     "scss": {
-      "enabled": true,
-      "source_map": true
+      "enabled": true
     }
   },
   "vars": {
@@ -50,6 +49,7 @@ why?
 | h      | help                     |
 | g      | generate uhc.config.json |
 | c      | load config              |
+| w      | watch path               |
 
 plz create an [issue](https://github.com/AyushmanTripathy/uhc/issues) to report any **bugs** or recommend us **features** we should add.
 
