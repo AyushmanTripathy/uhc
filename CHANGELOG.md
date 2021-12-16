@@ -1,19 +1,27 @@
 # CHANGELOG FOR UHC
 
+## 1.2.0
+
+#### CHANGES
+
+- watch mode
+- postcss
+- autoprefixer
+
 ## 1.1.0
 
-### ADDED
+#### CHANGES
 
 - inherit vars from parents
 - change $foo => ${foo}
 
-### FIXED
+#### BUGS FIXED
 
 - file.match returning null error
 
 ## 1.0.0
 
-### ADDED
+#### CHANGES
 
 - importing html components
 - comments
@@ -22,7 +30,7 @@
 - css support
 - $foo vars
 
-### FIXED
+#### BUGS FIXED
 
 - removed // comments
 - style tag regex error

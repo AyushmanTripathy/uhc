@@ -1,8 +1,29 @@
 # UHC
 
-## (useful html compiler)
+#### (useful html compiler)
+
+why?
+
+- importing components
+
+```html
+<import path="./component.html" foo="bar" />
+```
+
+- variables
+
+```html
+<p>hello ${foo}</p>
+```
+
+- don't waste time on multiple configs just one, uhc.config.json.
+- install just one package, no need to manage plugins.
+- sass && postcss support.
+- `/**/` comments
 
 ## Configs
+
+**uhc.config.json**
 
 ```json
 {

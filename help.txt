@@ -5,9 +5,10 @@ options
   -h : help
   -g : generate uhc.config.json
   -c : load config
+  -w : watch dir
 
 plz create an issue to report any bugs
-or recommend us features we should add
+or recommend us features we should add.
  https://github.com/AyushmanTripathy/uhc/issues 
 
-thank you for using uhc 
+thank you for using uhc!

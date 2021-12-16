@@ -4,9 +4,10 @@
   "css": {
     "autoprefix": true,
     "prefix": "@import \"./mixins.scss\";",
+    "stylelint": true,
     "scss": {
       "enabled": true,
-      "source_map": false 
+      "source_map": true
     }
   },
   "vars": {

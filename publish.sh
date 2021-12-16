@@ -15,22 +15,13 @@ echo 'commit version code'
 read null
 
 update-npm
-npm version minor || error "version change error"
 
 echo "publishing"
 npm publish || error 'publishing error'
 
-# pushing to master
 git push origin master || error 'pushing to origin error'
 
-echo "merging master --> release"
-
-curl \
-  -X POST \
-  -u "AyushmanTripathy":$(cat ~/.pat/git) \
-  -H "Accept: application/vnd.github.v3+json" \
-  "https://api.github.com/repos/AyushmanTripathy/hcc/merges" \
-  -d '{"base":"release","head":"master"}' | error 'merging error'
+merge-master-release uhc || error "merge error"
 echo "merge complete"
 
 echo 'successfully published'

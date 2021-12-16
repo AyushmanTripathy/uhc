@@ -1,20 +1,21 @@
 #!/usr/bin/env node
 
-import { red } from "btss";
+import { red, green } from "btss";
 import { resolve } from "path";
-import { readFileSync, writeFile, existsSync } from "fs";
+import { readFileSync, writeFile, watch, existsSync } from "fs";
 import parseIndex from "./parser.js";
-import cmd from "node-cmd";
-import { promisify } from "util";
+
+import sass from "sass";
+import postcss from "postcss";
+import autoprefixer from "autoprefixer";
 
 globalThis.hash_no = 0;
 globalThis.log = (str) => console.log(str);
 globalThis.error = (str) => {
   console.log(red("[ERROR] ") + str);
+  console.log("terminating compilation...");
   process.exit(1);
 };
-
-const exec = promisify(cmd.run);
 
 try {
   init();
@@ -22,19 +23,41 @@ try {
   error(e.message);
 }
 
-function init() {
-  const { words, options } = checkArgs(process.argv.splice(2));
+function watchDir(path) {
+  globalThis.watch_delay = false;
+
+  watch(path, (eventType, filename) => {
+    if (!watch_delay) {
+      log(green("Change dectected..."));
+
+      init(true);
+      globalThis.watch_delay = true;
+      setTimeout(() => {
+        globalThis.watch_delay = false;
+      }, 50);
+    }
+  });
+}
+
+function init(watch) {
   let config_path = "uhc.config.json";
 
-  for (const option in options) {
-    switch (option) {
-      case "g":
-        return generateConfig();
-      case "c":
-        config_path = options[option] == true ? config_path : options[option];
-        break;
-      case "h":
-        return help();
+  if (!watch) {
+    const { words, options } = checkArgs(process.argv.splice(2));
+    for (const option in options) {
+      switch (option) {
+        case "g":
+          return generateConfig();
+        case "c":
+          config_path =
+            options[option] == true ? config_path : options[option];
+          break;
+        case "w":
+          if (options[option] == true) error("watch path required");
+          return watchDir(options[option]);
+        case "h":
+          return help();
+      }
     }
   }
 
@@ -43,7 +66,7 @@ function init() {
   if (!existsSync(config_path))
     error(
       config_path +
-        " doesn't exists. use -gc to generate config file or use -c to link your config file"
+        " doesn't exists. use -g to generate config file or use -c to link your config file"
     );
 
   globalThis.config = JSON.parse(readFileSync(config_path));
@@ -59,23 +82,27 @@ function init() {
 async function compile() {
   let [html, css] = parseIndex(src + "/index.html");
 
-  let css_output = build + "/bundle" + (config.css.scss ? ".scss" : ".css");
   if (config.css) {
     css = css.replaceAll(/<\/style.*>/g, "");
     css = css.replaceAll(/<style(.||\n)[^>]*>/g, "");
     if (config.css.prefix) css = config.css.prefix + css;
-    write(css, css_output);
   } else error("css configs not found");
 
-  //scss
-  if (config.css.scss)
-    exec(
-      `sass ${css_output} ${build + "/bundle.css"} ${
-        config.css.scss.source_map ? "" : "--no-source-map"
-      } --load-path="${src}"`
-    );
+  // sass
+  const sass_output = sass.compileString(css, {
+    loadPaths: [src],
+  });
 
-  //autoprefixer
+  const plugins = [];
+  if (config.css.autoprefix) plugins.push(autoprefixer);
+
+  // postcss
+  postcss(plugins)
+    .process(sass_output.css, { from: "bundle.css" })
+    .then((res) => {
+      write(res.css, build + "/bundle.css");
+      if (res.map) write(res.map, build + "/bundle.css.map");
+    });
 
   //html
   write(
