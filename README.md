@@ -1,6 +1,6 @@
 # UHC
 
-#### (useful html compiler)
+the useful html compiler for when you don't need a framework
 
 why?
 
@@ -32,12 +32,13 @@ why?
   "css": {
     "autoprefix": true,
     "prefix": "@import \"./global.scss\";",
-    "scss": {
-      "enabled": true
-    }
+    "sass": true 
   },
   "vars": {
     "foo": "bar"
+  },
+  "routes": {
+    "/": "index.html"
   }
 }
 ```

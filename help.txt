@@ -7,6 +7,8 @@ options
   -c : load config
   -w : watch dir
 
+stuck? read the docs!
+
 plz create an issue to report any bugs
 or recommend us features we should add.
  https://github.com/AyushmanTripathy/uhc/issues 

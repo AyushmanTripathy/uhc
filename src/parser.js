@@ -14,19 +14,24 @@ export default function parseIndex(path) {
     }
   }
 
-  let body = file.match(new RegExp("<body(.||\n)*</bodys*>", "g"));
-  if (!body) error("body not found in input file");
-  if (body.length - 1) error("multiple body tags found");
-  body = body[0];
+  if (!config.template) {
+    let body = file.match(new RegExp("<body(.||\n)*</body( )*>", "g"));
+    if (!body) error("body not found in input file");
+    if (body.length - 1) error("multiple body tags found");
+    body = body[0];
 
-  file = file.match(new RegExp("<head(.||\n)*</heads*>", "g"));
-  if (!file) error("head not found in input file");
-  if (file.length - 1) error("multiple head tags found");
-  file = file[0];
+    file = file.match(new RegExp("<head(.||\n)*</heads*>", "g"));
+    if (!file) error("head not found in input file");
+    if (file.length - 1) error("multiple head tags found");
+    file = file[0];
 
-  [body, css] = parse(css + body, config.vars, 1);
-
-  return [`<!DOCTYPE html><html lang="en">${file + body}</html>`, css];
+    [body, css] = parse(css + body, config.vars, 1);
+    return [`<!DOCTYPE html><html lang="en">${file + body}</html>`, css];
+  } else {
+    [file, css] = parse(css + file, config.vars, 1);
+    file = template.replace(/<\/body(\s)*>/, file + "</body>");
+    return [file, css];
+  }
 }
 
 function parse(input, vars = {}, isIndex) {
@@ -35,15 +40,25 @@ function parse(input, vars = {}, isIndex) {
 
   //comments
   file = file.replaceAll(/\/\*(.||\n)*\*\//g, "");
-  //file = file.replaceAll(/\/\/(.)*/g, "");
 
   let css = "";
   [file, css] = parseCss(file, class_name);
+  file = checkLoops(file);
   file = addClassName(file, class_name);
   file = checkVars(file, vars);
   const temp = checkImports(file, vars);
   temp[1] += css;
   return temp;
+}
+
+function checkLoops(file) {
+  const styles = file.match(new RegExp("<body(.||\n)*</body( )*>", "g"));
+  if (styles) {
+    for (const style of styles) {
+      file = file.replace(style, "");
+      css += style;
+    }
+  }
 }
 
 function addClassName(file, class_name) {
@@ -87,7 +102,7 @@ function parseCss(file, class_name) {
 }
 
 function checkVars(file, vars) {
-  const statments = file.match(/\${(.||\n)[^}]*}/g);
+  const statments = file.match(/\${(.)[^}]*}/g);
   if (statments) {
     for (const statment of statments) {
       const var_name = statment.slice(2, -1).trim();
@@ -121,5 +136,5 @@ function checkImports(file, variables) {
 }
 function path(path) {
   path = path.endsWith(".html") ? path : path + ".html";
-  return resolve(src, path);
+  return resolve(from_dir, path);
 }

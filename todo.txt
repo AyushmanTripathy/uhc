@@ -1,8 +1,14 @@
 DONE
 ----
+template
 routing
 
 TODO
 ----
 
 write docs
+  change help.txt
+
+import relative to target
+loops
+conditional flow

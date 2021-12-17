@@ -80,6 +80,10 @@ async function init(watch) {
   globalThis.src = resolve(config_path, "../" + config.src_dir);
   globalThis.build = resolve(config_path, "../" + config.build_dir);
 
+  if (config.template)
+    globalThis.template = readFileSync(resolve(src, config.template), "utf-8");
+  if (!config.routes) error("routes not specified");
+  if (!Object.keys(config.routes).length) error("at least one route required");
   compile(config.routes);
 }
 
@@ -94,6 +98,8 @@ async function compile(routes, dir_path = "") {
 
         const from = resolve(config.src_dir, input_file);
         const to = resolve(config.build_dir, dir_path + route);
+        globalThis.from_dir = resolve(from, "../");
+
         await compileRoute(from, to);
         break;
       case "object":
@@ -115,32 +121,28 @@ async function compileRoute(from, to) {
     if (config.css.prefix) css = config.css.prefix + css;
   } else error("css configs not found");
 
-  const id = "/bundle" + hash();
-  //html
-  write(
-    html.replace(
-      /<\/head\s*>/,
-      `<link rel="stylesheet" href=".` + id + `.css"/></head>`
-    ),
-    to
-  );
+  const id = "/bundle" + hash() + ".css";
+  const to_dir = resolve(to, "../");
 
-  to = resolve(to, "../");
   // sass
-  const sass_output = sass.compileString(css, {
-    loadPaths: [src],
-  });
+  if (config.css.sass) {
+    css = sass.compileString(css, {
+      loadPaths: [from_dir],
+    }).css;
+  }
 
   const plugins = [];
   if (config.css.autoprefix) plugins.push(autoprefixer);
 
   // postcss
-  await postcss(plugins)
-    .process(sass_output.css, { from: id.slice(1) })
-    .then((res) => {
-      write(res.css, to + id + ".css");
-      if (res.map) write(res.map, to + id + ".css.map");
-    });
+  if (plugins.length) {
+    const res = await postcss(plugins).process(css, { from: id.slice(1) });
+    if (res.map) write(res.map, to_dir + id + ".map");
+    css = res.css;
+  }
+
+  //html
+  write(html.replace(/<\/head\s*>/, `<style>` + css + `</style></head>`), to);
 }
 
 function write(content, path, isNotRelative) {
