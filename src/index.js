@@ -116,8 +116,8 @@ async function compileRoute(from, to) {
   let [html, css] = parseIndex(from);
 
   if (config.css) {
-    css = css.replaceAll(/<\/style.*>/g, "");
-    css = css.replaceAll(/<style(.||\n)[^>]*>/g, "");
+    css = css.replaceAll(/<\/style( )*>/g, "");
+    css = css.replaceAll(/<style(.||\n)[^<]*>/g, "");
     if (config.css.prefix) css = config.css.prefix + css;
   } else error("css configs not found");
 

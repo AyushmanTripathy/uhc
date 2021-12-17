@@ -52,13 +52,20 @@ function parse(input, vars = {}, isIndex) {
 }
 
 function checkLoops(file) {
-  const styles = file.match(new RegExp("<body(.||\n)*</body( )*>", "g"));
-  if (styles) {
-    for (const style of styles) {
-      file = file.replace(style, "");
-      css += style;
-    }
-  }
+  let loop = file.match(new RegExp("<loop(.||\n)*</loop( )*>", ""));
+  if (loop) {
+    loop = loop[0];
+    const count = checkAttributes(loop).count;
+    if (!count) error("count not specified for loop\n" + loop);
+    file = file.replace(
+      loop,
+      loop
+        .replaceAll(/<\/loop(\s)*>/g, "")
+        .replaceAll(/<loop(.||\n)[^>]*>/g, "")
+        .repeat(count)
+    );
+    return checkLoops(file);
+  } else return file;
 }
 
 function addClassName(file, class_name) {
@@ -118,22 +125,28 @@ function checkImports(file, variables) {
   let css = "";
   if (imports) {
     for (const imp of imports) {
-      const attributes = imp.match(/[a-z]+="(\n||.)[^"]*"/gi);
-      const vars = { ...variables };
-      if (attributes) {
-        for (let attribute of attributes) {
-          attribute = attribute.slice(0, -1).split('="');
-          vars[attribute[0]] = attribute[1];
-        }
-      }
+      const vars = checkAttributes(imp);
       if (!vars.path) error("path not specified for import\n" + imp);
-      const [html, styles] = parse(path(vars.path), vars);
+      const [html, styles] = parse(path(vars.path), { ...vars, ...variables });
       css += styles;
       file = file.replace(imp, html);
     }
   }
   return [file, css];
 }
+
+function checkAttributes(tag) {
+  const attributes = tag.match(/[a-z]+="(\n||.)[^"]*"/gi);
+  const vars = {};
+  if (attributes) {
+    for (let attribute of attributes) {
+      attribute = attribute.slice(0, -1).split('="');
+      vars[attribute[0]] = attribute[1];
+    }
+  }
+  return vars;
+}
+
 function path(path) {
   path = path.endsWith(".html") ? path : path + ".html";
   return resolve(from_dir, path);
