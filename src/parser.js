@@ -25,28 +25,29 @@ export default function parseIndex(path) {
     if (file.length - 1) error("multiple head tags found");
     file = file[0];
 
-    [body, css] = parse(css + body, config.vars, 1);
+    [body, css] = parse(path, config.vars, css + body);
     return [`<!DOCTYPE html><html lang="en">${file + body}</html>`, css];
   } else {
-    [file, css] = parse(css + file, config.vars, 1);
+    [file, css] = parse(path, config.vars, css + file);
     file = template.replace(/<\/body(\s)*>/, file + "</body>");
     return [file, css];
   }
 }
 
-function parse(input, vars = {}, isIndex) {
+function parse(path, vars = {}, index) {
   const class_name = "uhc" + hash();
-  let file = isIndex ? input : readFileSync(input, "utf-8");
+  let file = index ? index : readFileSync(path, "utf-8");
+  path = resolve(path, "../");
 
   //comments
   file = file.replaceAll(/\/\*(.||\n)*\*\//g, "");
 
   let css = "";
   [file, css] = parseCss(file, class_name);
-  file = checkLoops(file);
+  //file = checkLoops(file);
   file = addClassName(file, class_name);
-  file = checkVars(file, vars);
-  const temp = checkImports(file, vars);
+  if (config.vars) file = checkVars(file, vars);
+  const temp = checkImports(file, vars, path);
   temp[1] += css;
   return temp;
 }
@@ -55,13 +56,14 @@ function checkLoops(file) {
   let loop = file.match(new RegExp("<loop(.||\n)*</loop( )*>", ""));
   if (loop) {
     loop = loop[0];
+    log(loop);
     const count = checkAttributes(loop).count;
     if (!count) error("count not specified for loop\n" + loop);
     file = file.replace(
       loop,
       loop
-        .replaceAll(/<\/loop(\s)*>/g, "")
-        .replaceAll(/<loop(.||\n)[^>]*>/g, "")
+        .replace(/<\/loop(\s)*>/, "")
+        .replace(/<loop(.||\n)[^>]*>/, "")
         .repeat(count)
     );
     return checkLoops(file);
@@ -120,14 +122,17 @@ function checkVars(file, vars) {
   return file;
 }
 
-function checkImports(file, variables) {
+function checkImports(file, variables, path) {
   const imports = file.match(new RegExp("<import (.||\n)[^>]*/>", "gi"));
   let css = "";
   if (imports) {
     for (const imp of imports) {
       const vars = checkAttributes(imp);
       if (!vars.path) error("path not specified for import\n" + imp);
-      const [html, styles] = parse(path(vars.path), { ...vars, ...variables });
+      const [html, styles] = parse(import_path(vars.path, path), {
+        ...vars,
+        ...variables,
+      });
       css += styles;
       file = file.replace(imp, html);
     }
@@ -147,7 +152,7 @@ function checkAttributes(tag) {
   return vars;
 }
 
-function path(path) {
+function import_path(path, src) {
   path = path.endsWith(".html") ? path : path + ".html";
-  return resolve(from_dir, path);
+  return resolve(src, path);
 }

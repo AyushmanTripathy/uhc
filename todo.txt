@@ -1,5 +1,6 @@
 DONE
 ----
+import relative to target
 fixed regex error in compileRoute
 template
 routing
@@ -9,7 +10,6 @@ TODO
 
 write docs
   change help.txt
-
-import relative to target
 loops
+  fix checkLoops infintie loop
 conditional flow

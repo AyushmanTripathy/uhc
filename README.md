@@ -1,4 +1,4 @@
-# UHC
+<img src="./icon.png" alt="UTC icon"/>
 
 the useful html compiler for when you don't need a framework
 

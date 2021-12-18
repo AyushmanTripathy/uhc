@@ -14,6 +14,12 @@ read null
 echo 'commit version code'
 read null
 
+echo "compiling docs"
+sh docs/compile.sh
+cd ./website
+uhc
+cd ..
+
 update-npm
 
 echo "publishing"
