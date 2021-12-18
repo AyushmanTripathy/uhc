@@ -21,6 +21,8 @@ why?
 - sass && postcss support.
 - `/**/` comments
 
+check out the [DOCS](https://uhcjs.netlify.app/docs.html) to learn more!
+
 ## Configs
 
 **uhc.config.json**
@@ -29,6 +31,7 @@ why?
 {
   "src_dir": "src",
   "build_dir": "public",
+  "template": "template.html",
   "css": {
     "autoprefix": true,
     "prefix": "@import \"./global.scss\";",

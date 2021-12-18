@@ -1,8 +1,23 @@
 # CHANGELOG FOR UHC
 
-## 1.2.0
+## 1.3.0
+
+#### ADDED
+
+- template
+- routing
 
 #### CHANGES
+
+- use relative path to import component.
+
+#### BUGS FIXED
+
+- fixed regex error in compileRoute
+
+## 1.2.0
+
+#### ADDED
 
 - watch mode
 - postcss
@@ -21,7 +36,7 @@
 
 ## 1.0.0
 
-#### CHANGES
+#### ADDED
 
 - importing html components
 - comments

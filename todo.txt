@@ -1,10 +1,5 @@
 DONE
 ----
-import relative to target
-fixed regex error in compileRoute
-template
-routing
-
 TODO
 ----
 
@@ -12,4 +7,3 @@ write docs
   change help.txt
 loops
   fix checkLoops infintie loop
-conditional flow

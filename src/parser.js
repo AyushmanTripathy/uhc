@@ -46,7 +46,7 @@ function parse(path, vars = {}, index) {
   [file, css] = parseCss(file, class_name);
   //file = checkLoops(file);
   file = addClassName(file, class_name);
-  if (config.vars) file = checkVars(file, vars);
+  if (config.vars != false) file = checkVars(file, vars);
   const temp = checkImports(file, vars, path);
   temp[1] += css;
   return temp;

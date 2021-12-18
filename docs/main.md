@@ -64,6 +64,7 @@ UHC, the useful html compiler, for when you don't need a javascript framework.
 ```
 
 - vars can be globally declared from uhc.config.json.
+- setting vars to false will disable vars.
 
 ```json
 "vars": {
