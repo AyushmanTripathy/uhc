@@ -1,0 +1,66 @@
+<img src="./icon.png" alt="UTC icon"/>
+
+<p>the useful html compiler for when you don&#39;t need a framework</p>
+<p>why?</p>
+<ul>
+<li>importing components</li>
+</ul>
+<pre><code class="language-html">&lt;import path=&quot;./component.html&quot; foo=&quot;bar&quot; /&gt;
+</code></pre>
+<ul>
+<li>variables</li>
+</ul>
+<pre><code class="language-html">&lt;p&gt;hello ${foo}&lt;/p&gt;
+</code></pre>
+<ul>
+<li>don&#39;t waste time on multiple configs just one, uhc.config.json.</li>
+<li>install just one package, no need to manage plugins.</li>
+<li>sass &amp;&amp; postcss support.</li>
+<li><code>/**/</code> comments</li>
+</ul>
+<h2 id="configs">Configs</h2>
+<p><strong>uhc.config.json</strong></p>
+<pre><code class="language-json">{
+  &quot;src_dir&quot;: &quot;src&quot;,
+  &quot;build_dir&quot;: &quot;public&quot;,
+  &quot;css&quot;: {
+    &quot;autoprefix&quot;: true,
+    &quot;prefix&quot;: &quot;@import \&quot;./global.scss\&quot;;&quot;,
+    &quot;sass&quot;: true 
+  },
+  &quot;vars&quot;: {
+    &quot;foo&quot;: &quot;bar&quot;
+  },
+  &quot;routes&quot;: {
+    &quot;/&quot;: &quot;index.html&quot;
+  }
+}
+</code></pre>
+<h2 id="options">options</h2>
+<table>
+<thead>
+<tr>
+<th>option</th>
+<th>function</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>h</td>
+<td>help</td>
+</tr>
+<tr>
+<td>g</td>
+<td>generate uhc.config.json</td>
+</tr>
+<tr>
+<td>c</td>
+<td>load config</td>
+</tr>
+<tr>
+<td>w</td>
+<td>watch path</td>
+</tr>
+</tbody></table>
+<p>plz create an <a href="https://github.com/AyushmanTripathy/uhc/issues">issue</a> to report any <strong>bugs</strong> or recommend us <strong>features</strong> we should add.</p>
+<h4 id="thank-you-for-using-uhc">thank you for using uhc</h4>
+

@@ -1,0 +1,15 @@
+{
+  "src_dir": "src",
+  "build_dir": "public",
+  "template": "template.html",
+  "css": {
+    "autoprefix": true,
+    "prefix": "@import \"../mixins.scss\";",
+    "sass": true 
+  },
+  "vars": false,
+  "routes": {
+    "/": "home/home.html",
+    "docs":"docs/docs.html"
+  }
+}
