@@ -1,0 +1,146 @@
+<h1 id="introduction">Introduction</h1>
+<p>UHC, the useful html compiler, for when you don&#39;t need a javascript framework.</p>
+<h1 id="config">Config</h1>
+<ul>
+<li>uhc.config.json is one config you will ever need.</li>
+<li>use <code>uhc -g</code> to generate uhc.config.json.</li>
+<li>all other paths should be relative to src and build dir accordingly.</li>
+</ul>
+<pre><code class="language-json">{
+  &quot;src_dir&quot;: &quot;src&quot;,
+  &quot;build_dir&quot;: &quot;public&quot;,
+  &quot;template&quot;: &quot;template.html&quot;,
+  &quot;css&quot;: {
+    &quot;autoprefix&quot;: true,
+    &quot;prefix&quot;: &quot;@import \&quot;./global.scss\&quot;;&quot;,
+    &quot;sass&quot;: true
+  },
+  &quot;vars&quot;: {
+    &quot;foo&quot;: &quot;bar&quot;
+  },
+  &quot;routes&quot;: {
+    &quot;/&quot;: &quot;index.html&quot;
+  }
+}
+</code></pre>
+<h1 id="component-format">Component format</h1>
+<ul>
+<li>stylesheets linked are not compiled.</li>
+<li>styles in components are encapsulated, so you don&#39;t have to guess selectors.</li>
+<li>css are collected and then sass and postcss are applied afterwards.</li>
+<li>load path for sass is the index file.</li>
+<li>an example component</li>
+</ul>
+<pre><code class="language-html">&lt;style&gt;
+  main {
+    // css styles
+  }
+&lt;/style&gt;
+
+&lt;h1&gt;title&lt;/h1&gt;
+&lt;main&gt;
+  &lt;p&gt;some text&lt;/p&gt;
+  &lt;import path=&quot;some other component&quot; /&gt;
+&lt;/main&gt;
+</code></pre>
+<h1 id="importing">Importing</h1>
+<pre><code class="language-html">&lt;import path=&quot;./component&quot; /&gt;
+</code></pre>
+<h1 id="variables">Variables</h1>
+<ul>
+<li>variables can be used by <code>${}</code> syntax.</li>
+</ul>
+<pre><code class="language-html">&lt;p&gt;hello ${ foo }&lt;/p&gt;
+</code></pre>
+<ul>
+<li>vars can be globally declared from uhc.config.json.</li>
+</ul>
+<pre><code class="language-json">&quot;vars&quot;: {
+  &quot;foo&quot;: &quot;bar&quot;
+},
+</code></pre>
+<ul>
+<li>vars can be passed to component from then import tag.</li>
+<li>components inherit vars from thier parents.</li>
+</ul>
+<pre><code class="language-html">&lt;import path=&quot;./component&quot; foo=&quot;bar&quot; /&gt;
+</code></pre>
+<h4 id="note">NOTE</h4>
+<ul>
+<li>uhc is a compiler so <code>${}</code> cannot perform any math or logic.</li>
+<li><code>${}</code> cannot contain <code>\n</code>.</li>
+</ul>
+<h1 id="routes">Routes</h1>
+<ul>
+<li>Routes are used to compile diffrent html files.</li>
+</ul>
+<pre><code class="language-json">&quot;routes&quot;: {
+  &quot;/&quot;: &quot;index.html&quot;,
+  &quot;project&quot;: {
+    &quot;/&quot;: &quot;project.html&quot;,
+    &quot;table&quot;: &quot;table.html&quot;
+  },
+  &quot;settings&quot;: &quot;settings.html&quot;
+}
+</code></pre>
+<ul>
+<li>Directory structure it creates.</li>
+</ul>
+<pre><code>build/
+├── index.html
+├── project
+│   ├── index.html
+│   └── table.html
+└── settings.html
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>url</th>
+<th>html</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>website.com/</td>
+<td>index.html</td>
+</tr>
+<tr>
+<td>website.com/project</td>
+<td>project.html</td>
+</tr>
+<tr>
+<td>website.com/project/table.html</td>
+<td>table.html</td>
+</tr>
+<tr>
+<td>website.com/settings.html</td>
+<td>settings.html</td>
+</tr>
+</tbody></table>
+<h1 id="template">Template</h1>
+<ul>
+<li>template are used share code across diffrent routes.</li>
+<li>templates must have a body tag where compiled code is injected.</li>
+<li>templates itself will not be compiled.</li>
+<li>templates are optional.</li>
+</ul>
+<pre><code>&quot;template&quot;:&quot;template.html&quot;,
+</code></pre>
+<ul>
+<li>an example template</li>
+</ul>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot; /&gt;
+    &lt;link rel=&quot;icon&quot; href=&quot;./icon.png&quot; /&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;./global.css&quot; /&gt;
+    &lt;title&gt;Website&lt;/title&gt;
+    // compiled css will be injected here.
+  &lt;/head&gt;
+  &lt;body&gt;
+    // compiled html will be injected here.
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+

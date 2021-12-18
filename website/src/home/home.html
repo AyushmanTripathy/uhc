@@ -1,0 +1,50 @@
+<style>
+  main {
+    @include absolute;
+    @include fullscreen;
+    @include flex(column);
+    @include center;
+
+    background-color: var(--bg);
+    color: var(--sec);
+    text-align: center;
+  }
+  h1 {
+    color: var(--hl);
+  }
+  h2 {
+    font-family: "Caveat", cursive;
+  }
+  img {
+    width: 300px;
+    aspect-ratio: 2.5/1;
+  }
+</style>
+<main>
+  <import path="../navbar" />
+  <img src="./icon.png" alt="UHC icon">
+  <h2>The useful html compiler</h2>
+  <p id="download">[ loading... ] npm downloads this month 🎉</p>
+  <a href="https://github.com/AyushmanTripathy/uhc">checkout the repo</a>
+  <p>try it out!</p>
+  <code>npm install -g uhc</code>
+</main>
+
+<script>
+  const download = document.querySelector("#download");
+
+  async function get() {
+    let response = await fetch(
+      "https://api.npmjs.org/downloads/range/last-month/uhc"
+    );
+
+    response = await response.json();
+    const count = response["downloads"].reduce(
+      (acc, cur) => acc + cur["downloads"],
+      0
+    )
+    download.innerHTML = count + " npm downloads this month 🎉"
+  }
+
+  window.onload = get;
+</script>

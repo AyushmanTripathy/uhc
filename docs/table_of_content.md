@@ -1,0 +1,7 @@
+1. [Introduction](#introduction)
+1. [Config](#config)
+1. [Component format](#component-format)
+1. [Importing](#importing)
+1. [Variables](#variables)
+1. [Routes](#routes)
+1. [Template](#template)

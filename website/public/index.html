@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    <link rel="icon" href="./icon.png">
+    <link rel="stylesheet" href="./markdowm.css" />
+    <link rel="stylesheet" href="./global.css" />
+    <title>UHC</title>
+  <style>:root {
+  --sec:#bbb;
+  --bg:#202124;
+  --hl:#047dffcb;
+}
+
+a {
+  text-decoration: none;
+  color: var(--sec);
+}
+
+a:hover {
+  color: var(--hl);
+}
+
+main.uhc90 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  align-items: center;
+  height: -webkit-fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+  width: 100vw;
+}
+
+h3.uhc90 {
+  font-family: "Caveat", cursive;
+}
+
+a.uhc90 {
+  text-decoration: none;
+  color: var(--sec);
+  margin-right: 2vw;
+  cursor: pointer;
+}
+a.uhc90:hover.uhc90 {
+  color: var(--hl);
+}
+
+main.uhc89 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg);
+  color: var(--sec);
+  text-align: center;
+}
+
+h1.uhc89 {
+  color: var(--hl);
+}
+
+h2.uhc89 {
+  font-family: "Caveat", cursive;
+}
+
+img.uhc89 {
+  width: 300px;
+  aspect-ratio: 2.5/1;
+}</style></head>
+  <body>
+<main class="uhc89">
+  <main class="uhc90">
+  <a href="/" class="uhc90"> <h3 class="uhc90">Home</h3></a>
+  <a href="/docs.html" class="uhc90"><h3 class="uhc90">Docs</h3></a>
+</main>
+
+
+
+  <img src="./icon.png" alt="UHC icon" class="uhc89">
+  <h2 class="uhc89">The useful html compiler</h2>
+  <p id="download" class="uhc89">[ loading... ] npm downloads this month 🎉</p>
+  <a href="https://github.com/AyushmanTripathy/uhc" class="uhc89">checkout the repo</a>
+  <p class="uhc89">try it out!</p>
+  <code class="uhc89">npm install -g uhc</code>
+</main>
+
+<script class="uhc89">
+  const download = document.querySelector("#download");
+
+  async function get() {
+    let response = await fetch(
+      "https://api.npmjs.org/downloads/range/last-month/uhc"
+    );
+
+    response = await response.json();
+    const count = response["downloads"].reduce(
+      (acc, cur) => acc + cur["downloads"],
+      0
+    )
+    download.innerHTML = count + " npm downloads this month 🎉"
+  }
+
+  window.onload = get;
+</script>
+</body>
+</html>

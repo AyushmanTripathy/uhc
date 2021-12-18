@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    <link rel="icon" href="./icon.png">
+    <link rel="stylesheet" href="./markdowm.css" />
+    <link rel="stylesheet" href="./global.css" />
+    <title>UHC</title>
+  <style>:root {
+  --sec:#bbb;
+  --bg:#202124;
+  --hl:#047dffcb;
+}
+
+a {
+  text-decoration: none;
+  color: var(--sec);
+}
+
+a:hover {
+  color: var(--hl);
+}
+
+main.uhc93.uhc93 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  align-items: center;
+  height: -webkit-fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+  width: 100vw;
+}
+
+h3 {
+  font-family: "Caveat", cursive;
+}
+
+a.uhc93 {
+  text-decoration: none;
+  color: var(--sec);
+  margin-right: 2vw;
+  cursor: pointer;
+}
+a.uhc93:hover.uhc93 {
+  color: var(--hl);
+}
+
+main.uhc92 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--bg);
+  color: var(--sec);
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  grid-template-rows: auto;
+  -moz-column-gap: 2vw;
+       column-gap: 2vw;
+  overflow-y: hidden;
+}
+
+section.uhc92 {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  width: 100vw;
+  overflow: scroll;
+}
+
+div.uhc92 {
+  width: 18vw;
+  margin-top: 50px;
+}
+
+article.uhc92 {
+  overflow: scroll;
+}
+
+.markdown-body.uhc92 {
+  box-sizing: border-box;
+  margin: 0 auto;
+  width: 78vw;
+  padding: 5px;
+}
+
+@media screen and (max-width: 920px) {
+  div.uhc92 {
+    display: none;
+  }
+}</style></head>
+  <body>
+<main class="uhc92">
+  <main class="uhc93">
+  <a href="/" class="uhc93"> <h3 class="uhc93">Home</h3></a>
+  <a href="/docs.html" class="uhc93"><h3 class="uhc93">Docs</h3></a>
+</main>
+
+
+
+  <section class="uhc92">
+    <div class="uhc92">
+      <ol class="uhc94">
+<li class="uhc94"><a href="#introduction" class="uhc94">Introduction</a></li>
+<li class="uhc94"><a href="#config" class="uhc94">Config</a></li>
+<li class="uhc94"><a href="#component-format" class="uhc94">Component format</a></li>
+<li class="uhc94"><a href="#importing" class="uhc94">Importing</a></li>
+<li class="uhc94"><a href="#variables" class="uhc94">Variables</a></li>
+<li class="uhc94"><a href="#routes" class="uhc94">Routes</a></li>
+<li class="uhc94"><a href="#template" class="uhc94">Template</a></li>
+</ol>
+
+    </div>
+    <article  class="uhc92 markdown-body">
+      <h1 id="introduction" class="uhc95">Introduction</h1>
+<p class="uhc95">UHC, the useful html compiler, for when you don&#39;t need a javascript framework.</p>
+<h1 id="config" class="uhc95">Config</h1>
+<ul class="uhc95">
+<li class="uhc95">uhc.config.json is one config you will ever need.</li>
+<li class="uhc95">use <code class="uhc95">uhc -g</code> to generate uhc.config.json.</li>
+<li class="uhc95">all other paths should be relative to src and build dir accordingly.</li>
+</ul>
+<pre class="uhc95"><code  class="uhc95 language-json">{
+  &quot;src_dir&quot;: &quot;src&quot;,
+  &quot;build_dir&quot;: &quot;public&quot;,
+  &quot;template&quot;: &quot;template.html&quot;,
+  &quot;css&quot;: {
+    &quot;autoprefix&quot;: true,
+    &quot;prefix&quot;: &quot;@import \&quot;./global.scss\&quot;;&quot;,
+    &quot;sass&quot;: true
+  },
+  &quot;vars&quot;: {
+    &quot;foo&quot;: &quot;bar&quot;
+  },
+  &quot;routes&quot;: {
+    &quot;/&quot;: &quot;index.html&quot;
+  }
+}
+</code></pre>
+<h1 id="component-format" class="uhc95">Component format</h1>
+<ul class="uhc95">
+<li class="uhc95">stylesheets linked are not compiled.</li>
+<li class="uhc95">styles in components are encapsulated, so you don&#39;t have to guess selectors.</li>
+<li class="uhc95">css are collected and then sass and postcss are applied afterwards.</li>
+<li class="uhc95">load path for sass is the index file.</li>
+<li class="uhc95">an example component</li>
+</ul>
+<pre class="uhc95"><code  class="uhc95 language-html">&lt;style&gt;
+  main {
+    // css styles
+  }
+&lt;/style&gt;
+
+&lt;h1&gt;title&lt;/h1&gt;
+&lt;main&gt;
+  &lt;p&gt;some text&lt;/p&gt;
+  &lt;import path=&quot;some other component&quot; /&gt;
+&lt;/main&gt;
+</code></pre>
+<h1 id="importing" class="uhc95">Importing</h1>
+<pre class="uhc95"><code  class="uhc95 language-html">&lt;import path=&quot;./component&quot; /&gt;
+</code></pre>
+<h1 id="variables" class="uhc95">Variables</h1>
+<ul class="uhc95">
+<li class="uhc95">variables can be used by <code class="uhc95">${}</code> syntax.</li>
+</ul>
+<pre class="uhc95"><code  class="uhc95 language-html">&lt;p&gt;hello ${ foo }&lt;/p&gt;
+</code></pre>
+<ul class="uhc95">
+<li class="uhc95">vars can be globally declared from uhc.config.json.</li>
+</ul>
+<pre class="uhc95"><code  class="uhc95 language-json">&quot;vars&quot;: {
+  &quot;foo&quot;: &quot;bar&quot;
+},
+</code></pre>
+<ul class="uhc95">
+<li class="uhc95">vars can be passed to component from then import tag.</li>
+<li class="uhc95">components inherit vars from thier parents.</li>
+</ul>
+<pre class="uhc95"><code  class="uhc95 language-html">&lt;import path=&quot;./component&quot; foo=&quot;bar&quot; /&gt;
+</code></pre>
+<h4 id="note" class="uhc95">NOTE</h4>
+<ul class="uhc95">
+<li class="uhc95">uhc is a compiler so <code class="uhc95">${}</code> cannot perform any math or logic.</li>
+<li class="uhc95"><code class="uhc95">${}</code> cannot contain <code class="uhc95">\n</code>.</li>
+</ul>
+<h1 id="routes" class="uhc95">Routes</h1>
+<ul class="uhc95">
+<li class="uhc95">Routes are used to compile diffrent html files.</li>
+</ul>
+<pre class="uhc95"><code  class="uhc95 language-json">&quot;routes&quot;: {
+  &quot;/&quot;: &quot;index.html&quot;,
+  &quot;project&quot;: {
+    &quot;/&quot;: &quot;project.html&quot;,
+    &quot;table&quot;: &quot;table.html&quot;
+  },
+  &quot;settings&quot;: &quot;settings.html&quot;
+}
+</code></pre>
+<ul class="uhc95">
+<li class="uhc95">Directory structure it creates.</li>
+</ul>
+<pre class="uhc95"><code class="uhc95">build/
+├── index.html
+├── project
+│   ├── index.html
+│   └── table.html
+└── settings.html
+</code></pre>
+<table class="uhc95">
+<thead class="uhc95">
+<tr class="uhc95">
+<th class="uhc95">url</th>
+<th class="uhc95">html</th>
+</tr>
+</thead>
+<tbody class="uhc95"><tr class="uhc95">
+<td class="uhc95">website.com/</td>
+<td class="uhc95">index.html</td>
+</tr>
+<tr class="uhc95">
+<td class="uhc95">website.com/project</td>
+<td class="uhc95">project.html</td>
+</tr>
+<tr class="uhc95">
+<td class="uhc95">website.com/project/table.html</td>
+<td class="uhc95">table.html</td>
+</tr>
+<tr class="uhc95">
+<td class="uhc95">website.com/settings.html</td>
+<td class="uhc95">settings.html</td>
+</tr>
+</tbody></table>
+<h1 id="template" class="uhc95">Template</h1>
+<ul class="uhc95">
+<li class="uhc95">template are used share code across diffrent routes.</li>
+<li class="uhc95">templates must have a body tag where compiled code is injected.</li>
+<li class="uhc95">templates itself will not be compiled.</li>
+<li class="uhc95">templates are optional.</li>
+</ul>
+<pre class="uhc95"><code class="uhc95">&quot;template&quot;:&quot;template.html&quot;,
+</code></pre>
+<ul class="uhc95">
+<li class="uhc95">an example template</li>
+</ul>
+<pre class="uhc95"><code  class="uhc95 language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot; /&gt;
+    &lt;link rel=&quot;icon&quot; href=&quot;./icon.png&quot; /&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;./global.css&quot; /&gt;
+    &lt;title&gt;Website&lt;/title&gt;
+    // compiled css will be injected here.
+  &lt;/head&gt;
+  &lt;body&gt;
+    // compiled html will be injected here.
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+
+    </article>
+  </section>
+</main>
+</body>
+</html>

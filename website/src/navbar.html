@@ -1,0 +1,32 @@
+<main>
+  <a href="/"> <h3>Home</h3></a>
+  <a href="/docs.html"><h3>Docs</h3></a>
+</main>
+
+<style>
+  main {
+    @include fixed;
+    @include flex(row);
+    justify-content: end;
+    align-items: center;
+
+    height: fit-content; 
+    width: 100vw;
+  }
+  
+  h3 {
+    font-family: "Caveat", cursive;
+  }
+
+  a {
+    text-decoration: none;
+    color: var(--sec);
+
+    margin-right: 2vw;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--hl);
+    }
+  }
+</style>

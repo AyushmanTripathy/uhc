@@ -1,8 +1,9 @@
 DONE
 ----
-
 TODO
 ----
 
 write docs
-routing
+  change help.txt
+loops
+  fix checkLoops infintie loop

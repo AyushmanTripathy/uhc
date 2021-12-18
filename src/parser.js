@@ -14,36 +14,60 @@ export default function parseIndex(path) {
     }
   }
 
-  let body = file.match(new RegExp("<body(.||\n)*</bodys*>", "g"));
-  if (!body) error("body not found in input file");
-  if (body.length - 1) error("multiple body tags found");
-  body = body[0];
+  if (!config.template) {
+    let body = file.match(new RegExp("<body(.||\n)*</body( )*>", "g"));
+    if (!body) error("body not found in input file");
+    if (body.length - 1) error("multiple body tags found");
+    body = body[0];
 
-  file = file.match(new RegExp("<head(.||\n)*</heads*>", "g"));
-  if (!file) error("head not found in input file");
-  if (file.length - 1) error("multiple head tags found");
-  file = file[0];
+    file = file.match(new RegExp("<head(.||\n)*</heads*>", "g"));
+    if (!file) error("head not found in input file");
+    if (file.length - 1) error("multiple head tags found");
+    file = file[0];
 
-  [body, css] = parse(css + body, config.vars, 1);
-
-  return [`<!DOCTYPE html><html lang="en">${file + body}</html>`, css];
+    [body, css] = parse(path, config.vars, css + body);
+    return [`<!DOCTYPE html><html lang="en">${file + body}</html>`, css];
+  } else {
+    [file, css] = parse(path, config.vars, css + file);
+    file = template.replace(/<\/body(\s)*>/, file + "</body>");
+    return [file, css];
+  }
 }
 
-function parse(input, vars = {}, isIndex) {
+function parse(path, vars = {}, index) {
   const class_name = "uhc" + hash();
-  let file = isIndex ? input : readFileSync(input, "utf-8");
+  let file = index ? index : readFileSync(path, "utf-8");
+  path = resolve(path, "../");
 
   //comments
   file = file.replaceAll(/\/\*(.||\n)*\*\//g, "");
-  //file = file.replaceAll(/\/\/(.)*/g, "");
 
   let css = "";
   [file, css] = parseCss(file, class_name);
+  //file = checkLoops(file);
   file = addClassName(file, class_name);
-  file = checkVars(file, vars);
-  const temp = checkImports(file, vars);
+  if (config.vars != false) file = checkVars(file, vars);
+  const temp = checkImports(file, vars, path);
   temp[1] += css;
   return temp;
+}
+
+function checkLoops(file) {
+  let loop = file.match(new RegExp("<loop(.||\n)*</loop( )*>", ""));
+  if (loop) {
+    loop = loop[0];
+    log(loop);
+    const count = checkAttributes(loop).count;
+    if (!count) error("count not specified for loop\n" + loop);
+    file = file.replace(
+      loop,
+      loop
+        .replace(/<\/loop(\s)*>/, "")
+        .replace(/<loop(.||\n)[^>]*>/, "")
+        .repeat(count)
+    );
+    return checkLoops(file);
+  } else return file;
 }
 
 function addClassName(file, class_name) {
@@ -87,7 +111,7 @@ function parseCss(file, class_name) {
 }
 
 function checkVars(file, vars) {
-  const statments = file.match(/\${(.||\n)[^}]*}/g);
+  const statments = file.match(/\${(.)[^}]*}/g);
   if (statments) {
     for (const statment of statments) {
       const var_name = statment.slice(2, -1).trim();
@@ -98,32 +122,37 @@ function checkVars(file, vars) {
   return file;
 }
 
-function checkImports(file, variables) {
+function checkImports(file, variables, path) {
   const imports = file.match(new RegExp("<import (.||\n)[^>]*/>", "gi"));
   let css = "";
   if (imports) {
     for (const imp of imports) {
-      const attributes = imp.match(/[a-z]+="(\n||.)[^"]*"/gi);
-      const vars = { ...variables };
-      if (attributes) {
-        for (let attribute of attributes) {
-          attribute = attribute.slice(0, -1).split('="');
-          vars[attribute[0]] = attribute[1];
-        }
-      }
+      const vars = checkAttributes(imp);
       if (!vars.path) error("path not specified for import\n" + imp);
-      const [html, styles] = parse(path(vars.path), vars);
+      const [html, styles] = parse(import_path(vars.path, path), {
+        ...vars,
+        ...variables,
+      });
       css += styles;
       file = file.replace(imp, html);
     }
   }
   return [file, css];
 }
-function path(path) {
+
+function checkAttributes(tag) {
+  const attributes = tag.match(/[a-z]+="(\n||.)[^"]*"/gi);
+  const vars = {};
+  if (attributes) {
+    for (let attribute of attributes) {
+      attribute = attribute.slice(0, -1).split('="');
+      vars[attribute[0]] = attribute[1];
+    }
+  }
+  return vars;
+}
+
+function import_path(path, src) {
   path = path.endsWith(".html") ? path : path + ".html";
   return resolve(src, path);
-}
-function hash() {
-  globalThis.hash_no += 1;
-  return globalThis.hash_no;
 }

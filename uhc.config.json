@@ -1,16 +1,16 @@
 {
   "src_dir": "test",
   "build_dir": "build",
+  "template": "template.html",
   "css": {
     "autoprefix": true,
     "prefix": "@import \"./mixins.scss\";",
-    "stylelint": true,
-    "scss": {
-      "enabled": true,
-      "source_map": true
-    }
+    "sass": true 
   },
   "vars": {
     "foo": "bar"
+  },
+  "routes": {
+    "/": "index.html"
   }
 }

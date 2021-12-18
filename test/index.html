@@ -1,31 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>AT</title>
-    <link rel="icon" href="profile.png" />
-    <link rel="stylesheet" href="global.css" />
-    <style>
-      main {
-        @include flex(column);
-        @include absolute;
-        
-        width: 100vw;
-        height: fit-content;
-        z-index: 1;
-      }
+<style>
+  main {
+    @include flex(column);
+    @include absolute;
 
-      section {
-        @include fullscreen;
-        background-color: transparent;
-      }
-    </style>
-  </head>
-  <body>
-    <import path="./home" />
-    <main>
-      <section></section>
-      <import path="./about" />
-    </main>
-  </body>
-</html>
+    width: 100vw;
+    height: fit-content;
+    z-index: 1;
+  }
+
+  section {
+    @include fullscreen;
+    background-color: transparent;
+  }
+</style>
+
+<import path="./home"/>
+<main>
+  <section></section>
+  <import path="./about" />
+</main>
