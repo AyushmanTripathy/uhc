@@ -1,0 +1,46 @@
+<style>
+  main {
+    @include page;
+    display: grid;
+
+    grid-template-columns: 1fr 3fr;
+    grid-template-rows: auto;
+    column-gap: 2vw;
+    overflow-y: hidden;
+  }
+  section {
+    @include flex(row);
+    @include fullscreen;
+    overflow: scroll;
+  }
+  div {
+    width: 18vw;
+    margin-top: 50px;
+  }
+  article {
+    overflow: scroll;
+  }
+  .markdown-body {
+    box-sizing: border-box;
+    margin: 0 auto;
+    width: 78vw;
+    padding: 5px;
+  }
+
+  @media screen and (max-width: 920px) {
+    div {
+      display: none;
+    }
+  }
+</style>
+<main>
+  <import path="../navbar" />
+  <section>
+    <div>
+      <import path="./table" />
+    </div>
+    <article class="markdown-body">
+      <import path="./content" />
+    </article>
+  </section>
+</main>

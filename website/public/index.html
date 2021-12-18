@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    <link rel="icon" href="./icon.png">
+    <link rel="stylesheet" href="./markdowm.css" />
+    <link rel="stylesheet" href="./global.css" />
+    <title>UHC</title>
+  <style>:root {
+  --sec:#bbb;
+  --bg:#202124;
+  --hl:#047dffcb;
+}
+
+a {
+  text-decoration: none;
+  color: var(--sec);
+}
+
+a:hover {
+  color: var(--hl);
+}
+
+main.uhc2 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  align-items: center;
+  height: -webkit-fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+  width: 100vw;
+}
+
+h3.uhc2 {
+  font-family: "Caveat", cursive;
+}
+
+a.uhc2 {
+  text-decoration: none;
+  color: var(--sec);
+  margin-right: 2vw;
+  cursor: pointer;
+}
+a.uhc2:hover.uhc2 {
+  color: var(--hl);
+}
+
+main.uhc1.uhc1 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg);
+  color: var(--sec);
+  text-align: center;
+}
+
+h1 {
+  color: var(--hl);
+}
+
+h2.uhc1 {
+  font-family: "Caveat", cursive;
+}
+
+img.uhc1 {
+  width: 300px;
+  aspect-ratio: 1;
+}</style></head>
+  <body>
+<main class="uhc1">
+  <main class="uhc2">
+  <a href="/" class="uhc2"> <h3 class="uhc2">Home</h3></a>
+  <a href="/docs.html" class="uhc2"><h3 class="uhc2">Docs</h3></a>
+</main>
+
+
+
+  <img src="./icon.png" alt="UHC icon" class="uhc1">
+  <h2 class="uhc1">The useful html compiler</h2>
+  <p id="download" class="uhc1">[ loading... ] npm downloads this month 🎉</p>
+  <a href="https://github.com/AyushmanTripathy/uhc" class="uhc1">checkout the repo</a>
+  <p class="uhc1">try it out!</p>
+  <code class="uhc1">npm install -g uhc</code>
+</main>
+
+<script class="uhc1">
+  const download = document.querySelector("#download");
+
+  async function get() {
+    let response = await fetch(
+      "https://api.npmjs.org/downloads/range/last-month/uhc"
+    );
+
+    response = await response.json();
+    const count = response["downloads"].reduce(
+      (acc, cur) => acc + cur["downloads"],
+      0
+    )
+    download.innerHTML = count + " npm downloads this month 🎉"
+  }
+
+  window.onload = get;
+</script>
+</body>
+</html>
