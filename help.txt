@@ -8,7 +8,7 @@ options
   -w : watch dir
 
 stuck? read the docs!
-  https://uhjs.netlify.app/docs.html
+  https://uhcjs.netlify.app/docs.html
 
 plz create an issue to report any bugs
 or recommend us features we should add.
