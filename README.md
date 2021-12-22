@@ -23,29 +23,6 @@ why?
 
 check out the [DOCS](https://uhcjs.netlify.app/docs.html) to learn more!
 
-## Configs
-
-**uhc.config.json**
-
-```json
-{
-  "src_dir": "src",
-  "build_dir": "public",
-  "template": "template.html",
-  "css": {
-    "autoprefix": true,
-    "prefix": "@import \"./global.scss\";",
-    "sass": true 
-  },
-  "vars": {
-    "foo": "bar"
-  },
-  "routes": {
-    "/": "index.html"
-  }
-}
-```
-
 ## options
 
 | option | function                 |

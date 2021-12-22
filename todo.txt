@@ -1,5 +1,7 @@
 DONE
 ----
+fixed mis-spell in help.txt
+
 TODO
 ----
 

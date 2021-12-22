@@ -1,5 +1,4 @@
 node_modules
 .npmrc
 build
-./uhc.config.json
 package-lock.json

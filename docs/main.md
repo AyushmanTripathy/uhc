@@ -2,6 +2,38 @@
 
 UHC, the useful html compiler, for when you don't need a javascript framework.
 
+why?
+
+- importing components
+
+```html
+<import path="./component.html" foo="bar" />
+```
+
+- variables
+
+```html
+<p>hello ${foo}</p>
+```
+
+- don't waste time on multiple configs just one, uhc.config.json.
+- install just one package, no need to manage plugins.
+- sass && postcss support.
+- `/**/` comments
+
+# Cli
+
+use `npm i uhc -g` to install uhc.
+
+| option | function                 |
+| ------ | ------------------------ |
+| h      | help                     |
+| g      | generate uhc.config.json |
+| c      | load config              |
+| w      | watch path               |
+
+#### thank you for using uhc
+
 # Config
 
 - uhc.config.json is one config you will ever need.

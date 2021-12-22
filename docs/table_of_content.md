@@ -1,4 +1,5 @@
 1. [Introduction](#introduction)
+1. [Cli](#cli)
 1. [Config](#config)
 1. [Component format](#component-format)
 1. [Importing](#importing)
