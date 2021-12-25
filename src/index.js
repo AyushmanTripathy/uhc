@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 
-import { red, green } from "btss";
+import { dim, red, green } from "btss";
 import { resolve } from "path";
+import { createInterface } from "readline";
+import { basename } from "path";
 import { readFileSync, writeFile, watch, mkdirSync, existsSync } from "fs";
 import parseIndex from "./parser.js";
 
 import sass from "sass";
 import postcss from "postcss";
+import chokidar from "chokidar";
+import liveServer from "live-server";
 import autoprefixer from "autoprefixer";
 
 globalThis.hash_no = 0;
@@ -16,75 +20,104 @@ globalThis.hash = () => {
   return hash_no;
 };
 globalThis.error = (str) => {
-  console.log(red("[ERROR] ") + str);
-  console.log("terminating compilation...");
-  process.exit(1);
+  throw red("[ERROR] ") + str;
 };
 
-try {
-  init();
-} catch (e) {
-  error(e.message);
-}
+let config_path = "uhc.config.json";
+const { words, options } = checkArgs(process.argv.splice(2));
 
-function watchDir(path) {
-  globalThis.watch_delay = false;
+init();
+async function watchDir(path) {
+  if (!existsSync(path)) error(path + " path doesn't exits");
+  log(green('"r" to recompile or "q" to quit'));
 
-  watch(path, () => {
-    if (!watch_delay) {
-      log(green("Change dectected..."));
+  createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    terminal: true,
+  }).on("line", (data) => {
+    if (data == "r") init(true);
+    else if (data == "q") process.exit();
+  });
 
-      init(true);
-      globalThis.watch_delay = true;
-      setTimeout(() => {
-        globalThis.watch_delay = false;
-      }, 50);
-    }
+  let compile_on_change = false;
+  setTimeout(() => {
+    compile_on_change = true;
+  }, 200);
+
+  chokidar.watch(path).on("all", (event, path) => {
+    if (!compile_on_change) return;
+    log(green(event + " : " + basename(path)));
+    init(true);
   });
 }
 
 async function init(watch) {
-  let config_path = "uhc.config.json";
-
-  if (!watch) {
-    const { words, options } = checkArgs(process.argv.splice(2));
-    for (const option in options) {
-      switch (option) {
-        case "g":
-          return generateConfig();
-        case "c":
-          config_path =
-            options[option] == true ? config_path : options[option];
-          break;
-        case "w":
-          if (options[option] == true) error("watch path required");
-          return watchDir(options[option]);
-        case "h":
-          return help();
+  try {
+    if (!watch) {
+      for (const option in options) {
+        switch (option) {
+          case "g":
+            return generateConfig();
+          case "c":
+            config_path =
+              options[option] == true ? config_path : options[option];
+            break;
+          case "w":
+            if (options[option] == true) error("watch path required");
+            return await watchDir(options[option]);
+          case "h":
+            return help();
+        }
       }
     }
+
+    // get config
+    config_path = "./" + config_path;
+    if (!existsSync(config_path))
+      error(
+        config_path +
+          " doesn't exists. use -g to generate config file or use -c to link your config file"
+      );
+
+    globalThis.config = JSON.parse(readFileSync(config_path));
+
+    if (!config.src_dir) error("src dir not specified!");
+    if (!config.build_dir) error("build dir not specified!");
+    globalThis.src = resolve(config_path, "../" + config.src_dir);
+    globalThis.build = resolve(config_path, "../" + config.build_dir);
+
+    // dev
+    if (!watch) {
+      for (const word of words) {
+        switch (word) {
+          case "dev":
+            const port = process.env.PORT || 8080;
+            liveServer.start({
+              port: port,
+              root: build,
+              file: ".",
+              open: false,
+              logLevel: 1,
+            });
+            return await watchDir(src);
+        }
+      }
+    }
+
+    if (config.template)
+      globalThis.template = readFileSync(
+        resolve(src, config.template),
+        "utf-8"
+      );
+    if (!config.routes) error("routes not specified");
+    if (!Object.keys(config.routes).length)
+      error("at least one route required");
+    await compile(config.routes);
+    if (!watch) log(dim("Compiled successfully!"));
+  } catch (e) {
+    console.error(e);
   }
-
-  //get config
-  config_path = "./" + config_path;
-  if (!existsSync(config_path))
-    error(
-      config_path +
-        " doesn't exists. use -g to generate config file or use -c to link your config file"
-    );
-
-  globalThis.config = JSON.parse(readFileSync(config_path));
-
-  if (!config.src_dir) error("src dir not specified!");
-  if (!config.build_dir) error("build dir not specified!");
-  globalThis.src = resolve(config_path, "../" + config.src_dir);
-  globalThis.build = resolve(config_path, "../" + config.build_dir);
-
-  if (config.template)
-    globalThis.template = readFileSync(resolve(src, config.template), "utf-8");
-  if (!config.routes) error("routes not specified");
-  if (!Object.keys(config.routes).length) error("at least one route required");
-  compile(config.routes);
 }
 
 async function compile(routes, dir_path = "") {
@@ -96,8 +129,8 @@ async function compile(routes, dir_path = "") {
         if (!route) route = "index.html";
         if (!route.endsWith(".html")) route += ".html";
 
-        const from = resolve(config.src_dir, input_file);
-        const to = resolve(config.build_dir, dir_path + route);
+        const from = resolve(src, input_file);
+        const to = resolve(build, dir_path + route);
         globalThis.from_dir = resolve(from, "../");
 
         await compileRoute(from, to);
@@ -126,9 +159,13 @@ async function compileRoute(from, to) {
 
   // sass
   if (config.css.sass) {
-    css = sass.compileString(css, {
-      loadPaths: [from_dir],
-    }).css;
+    try {
+      css = sass.compileString(css, {
+        loadPaths: [from_dir],
+      }).css;
+    } catch (e) {
+      return console.error(e.message);
+    }
   }
 
   const plugins = [];
@@ -136,9 +173,13 @@ async function compileRoute(from, to) {
 
   // postcss
   if (plugins.length) {
-    const res = await postcss(plugins).process(css, { from: id.slice(1) });
-    if (res.map) write(res.map, to_dir + id + ".map");
-    css = res.css;
+    try {
+      const res = await postcss(plugins).process(css, { from: id.slice(1) });
+      if (res.map) write(res.map, to_dir + id + ".map");
+      css = res.css;
+    } catch (e) {
+      return console.error(e);
+    }
   }
 
   //html

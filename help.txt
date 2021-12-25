@@ -7,6 +7,10 @@ options
   -c : load config
   -w : watch dir
 
+uhc dev
+-------
+watch src dir, recompile on changes with live-server.
+
 stuck? read the docs!
   https://uhcjs.netlify.app/docs.html
 

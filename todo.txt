@@ -1,10 +1,13 @@
 DONE
 ----
+added dev mode
+replaced recursive-watch with chokidar
 fixed mis-spell in help.txt
 
 TODO
 ----
 
+template scss is not processed
 write docs
   change help.txt
 loops

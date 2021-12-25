@@ -29,6 +29,9 @@ export default function parseIndex(path) {
     return [`<!DOCTYPE html><html lang="en">${file + body}</html>`, css];
   } else {
     [file, css] = parse(path, config.vars, css + file);
+    const bodies = template.match(/<\/body(\s)*>/g);
+    if (!bodies) error("body tag not found in template");
+    if (bodies.length != 1) error("multiple body tag in template");
     file = template.replace(/<\/body(\s)*>/, file + "</body>");
     return [file, css];
   }

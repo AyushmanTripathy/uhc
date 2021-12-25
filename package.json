@@ -21,6 +21,8 @@
   "dependencies": {
     "autoprefixer": "^10.4.0",
     "btss": "^1.0.0",
+    "chokidar": "^3.5.2",
+    "live-server": "^1.2.1",
     "postcss": "^8.4.5",
     "sass": "^1.45.0"
   }
