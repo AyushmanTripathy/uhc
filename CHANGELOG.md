@@ -1,5 +1,19 @@
 # CHANGELOG FOR UHC
 
+## 1.4.0
+
+### ADDED
+
+- added dev mode
+
+### CHANGES
+
+- replaced recursive-watch with chokidar
+
+### BUGS FIXED
+
+- fix pareIndex file refrence error
+
 ## 1.3.0
 
 #### ADDED
