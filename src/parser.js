@@ -15,23 +15,31 @@ export default function parseIndex(path) {
   }
 
   if (!config.template) {
-    let body = file.match(new RegExp("<body(.||\n)*</body( )*>", "g"));
-    if (!body) error("body not found in input file");
-    if (body.length - 1) error("multiple body tags found");
-    body = body[0];
-
-    file = file.match(new RegExp("<head(.||\n)*</heads*>", "g"));
-    if (!file) error("head not found in input file");
-    if (file.length - 1) error("multiple head tags found");
-    file = file[0];
-
+    let [body, head] = checkIndex(file, "\n" + path);
     [body, css] = parse(path, config.vars, css + body);
     return [`<!DOCTYPE html><html lang="en">${file + body}</html>`, css];
   } else {
-    [file, css] = parse(path, config.vars, css + file);
+    checkIndex(template," template file")
+    const temp = parse(path, config.vars, css + file);
+    file = temp[0]
+    css = temp[1]
+    const bodies = template.match(/<\/body(\s)*>/g);
     file = template.replace(/<\/body(\s)*>/, file + "</body>");
     return [file, css];
   }
+}
+
+function checkIndex(file, path) {
+  let body = file.match(new RegExp("<body(.||\n)*</body( )*>", "g"));
+  if (!body) error("body not found in input file " + path);
+  if (body.length - 1) error("multiple body tags found in " + path);
+  body = body[0];
+
+  let head = file.match(new RegExp("<head(.||\n)*</heads*>", "g"));
+  if (!head) error("head not found in input file " + path);
+  if (head.length - 1) error("multiple head tags found in " + path);
+  head = head[0];
+  return [body, head];
 }
 
 function parse(path, vars = {}, index) {

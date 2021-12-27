@@ -1,10 +1,10 @@
 DONE
 ----
-fixed mis-spell in help.txt
-
 TODO
 ----
 
+add class name sometimes not giving class name to a,p,span
+template scss is not processed
 write docs
   change help.txt
 loops

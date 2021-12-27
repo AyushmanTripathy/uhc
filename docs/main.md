@@ -16,14 +16,17 @@ why?
 <p>hello ${foo}</p>
 ```
 
+- routing made easy.
+- no need to involve npm, just install uhc globally.
 - don't waste time on multiple configs just one, uhc.config.json.
 - install just one package, no need to manage plugins.
 - sass && postcss support.
-- `/**/` comments
+- `/ ** /` comments
 
 # Cli
 
-use `npm i uhc -g` to install uhc.
+- use `npm i uhc -g` to install uhc.
+- `-c` option is still in development, usage is not recommended.
 
 | option | function                 |
 | ------ | ------------------------ |
@@ -32,12 +35,18 @@ use `npm i uhc -g` to install uhc.
 | c      | load config              |
 | w      | watch path               |
 
-#### thank you for using uhc
+# Dev mode
+
+run `uhc dev` and see your site on [localhost:8080](http://localhost:8080/),
+uhc will also watch for file changes (using chokidar) in src directory and will
+recompile and reload the browser (using live-server) on changes.
 
 # Config
 
 - uhc.config.json is one config you will ever need.
 - use `uhc -g` to generate uhc.config.json.
+- by default uhc will look for uhc.config.json in current working directory.
+  use `-c` to pass a custom path. (Not Recommended yet!)
 - all other paths should be relative to src and build dir accordingly.
 
 ```json
@@ -65,12 +74,13 @@ use `npm i uhc -g` to install uhc.
 - styles in components are encapsulated, so you don't have to guess selectors.
 - css are collected and then sass and postcss are applied afterwards.
 - load path for sass is the index file.
+- if no template is specified, main component must have head and body tags.
 - an example component
 
 ```html
 <style>
   main {
-    // css styles
+    // css or sass styles
   }
 </style>
 
@@ -131,6 +141,13 @@ use `npm i uhc -g` to install uhc.
 }
 ```
 
+| url                            | html          |
+| ------------------------------ | ------------- |
+| website.com/                   | index.html    |
+| website.com/project            | project.html  |
+| website.com/project/table.html | table.html    |
+| website.com/settings.html      | settings.html |
+
 - Directory structure it creates.
 
 ```
@@ -142,17 +159,10 @@ build/
 └── settings.html
 ```
 
-| url                            | html          |
-| ------------------------------ | ------------- |
-| website.com/                   | index.html    |
-| website.com/project            | project.html  |
-| website.com/project/table.html | table.html    |
-| website.com/settings.html      | settings.html |
-
 # Template
 
 - template are used share code across diffrent routes.
-- templates must have a body tag where compiled code is injected.
+- templates must have a body and head tag where compiled code is injected.
 - templates itself will not be compiled.
 - templates are optional.
 
@@ -173,7 +183,7 @@ build/
     // compiled css will be injected here.
   </head>
   <body>
-    // compiled html will be injected here.
+    // compiled html and js will be injected here.
   </body>
 </html>
 ```

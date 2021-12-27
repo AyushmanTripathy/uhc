@@ -4,8 +4,13 @@ UHC (the useful html compiler)
 options
   -h : help
   -g : generate uhc.config.json
-  -c : load config
+  -c : load config (usage is not recommended)
   -w : watch dir
+
+commands
+  dev : watch src dir, recompile on changes with live-server.
+
+uhc <command>
 
 stuck? read the docs!
   https://uhcjs.netlify.app/docs.html
