@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { dim, red, green } from "btss";
+import { bold, grey, red, green, yellow } from "btss";
 import { resolve } from "path";
 import { createInterface } from "readline";
 import { basename } from "path";
@@ -9,12 +9,14 @@ import parseIndex from "./parser.js";
 
 import sass from "sass";
 import postcss from "postcss";
+import dotenv from "dotenv";
 import chokidar from "chokidar";
 import liveServer from "live-server";
 import autoprefixer from "autoprefixer";
 
 globalThis.hash_no = 0;
 globalThis.log = (str) => console.log(str);
+globalThis.warn = (str) => log(yellow("[WARN] ") + str);
 globalThis.hash = () => {
   hash_no += 1;
   return hash_no;
@@ -23,8 +25,10 @@ globalThis.error = (str) => {
   throw red("[ERROR] ") + str;
 };
 
+dotenv.config();
 let config_path = "uhc.config.json";
 const { words, options } = checkArgs(process.argv.splice(2));
+log(bold("UHC 1.4.0"));
 
 init();
 async function watchDir(path) {
@@ -43,7 +47,7 @@ async function watchDir(path) {
   let compile_on_change = false;
   setTimeout(() => {
     compile_on_change = true;
-  }, 200);
+  }, 500);
 
   chokidar.watch(path).on("all", (event, path) => {
     if (!compile_on_change) return;
@@ -93,12 +97,13 @@ async function init(watch) {
         switch (word) {
           case "dev":
             const port = process.env.PORT || 8080;
+            log(build)
             liveServer.start({
               port: port,
               root: build,
               file: ".",
               open: false,
-              logLevel: 1,
+              logLevel: 2,
             });
             return await watchDir(src);
         }
@@ -113,8 +118,15 @@ async function init(watch) {
     if (!config.routes) error("routes not specified");
     if (!Object.keys(config.routes).length)
       error("at least one route required");
+
+    if (config.load) {
+      if (!config.vars) config.vars = {};
+      for (const key of config.load) {
+        if (!process.env[key]) warn("env var " + key + " is not defined");
+        config.vars[key] = process.env[key];
+      }
+    }
     await compile(config.routes);
-    if (!watch) log(dim("Compiled successfully!"));
   } catch (e) {
     console.error(e);
   }
@@ -184,6 +196,7 @@ async function compileRoute(from, to) {
 
   //html
   write(html.replace(/<\/head\s*>/, `<style>` + css + `</style></head>`), to);
+  log(grey("Compiled successfully!"));
 }
 
 function write(content, path, isNotRelative) {

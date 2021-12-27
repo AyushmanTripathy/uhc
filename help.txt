@@ -1,5 +1,5 @@
-UHC (the useful html compiler)
--------------------------------
+the useful html compiler
+------------------------
 
 options
   -h : help

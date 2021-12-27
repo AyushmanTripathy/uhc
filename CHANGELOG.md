@@ -1,5 +1,9 @@
 # CHANGELOG FOR UHC
 
+## 1.4.1
+
+- update to btss 1.1.0
+
 ## 1.4.0
 
 ### ADDED

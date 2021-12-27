@@ -123,7 +123,7 @@ function checkVars(file, vars) {
   if (statments) {
     for (const statment of statments) {
       const var_name = statment.slice(2, -1).trim();
-      if (!vars[var_name]) error(var_name + " is not defined");
+      if (!vars[var_name]) warn(var_name + " is not defined");
       file = file.replace(statment, vars[var_name]);
     }
   }

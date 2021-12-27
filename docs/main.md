@@ -48,6 +48,7 @@ recompile and reload the browser (using live-server) on changes.
 - by default uhc will look for uhc.config.json in current working directory.
   use `-c` to pass a custom path. (Not Recommended yet!)
 - all other paths should be relative to src and build dir accordingly.
+- load env variables from .env
 
 ```json
 {
@@ -59,6 +60,7 @@ recompile and reload the browser (using live-server) on changes.
     "prefix": "@import \"./global.scss\";",
     "sass": true
   },
+  "load": ["KEYS"],
   "vars": {
     "foo": "bar"
   },
