@@ -1,7 +1,5 @@
 DONE
 ----
-load dotenv as vars
-
 TODO
 ----
 

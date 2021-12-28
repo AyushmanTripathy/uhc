@@ -37,9 +37,11 @@ why?
 
 # Dev mode
 
-run `uhc dev` and see your site on [localhost:8080](http://localhost:8080/),
-uhc will also watch for file changes (using chokidar) in src directory and will
-recompile and reload the browser (using live-server) on changes.
+- run `uhc dev` and see your site on [localhost:8080](http://localhost:8080/),
+  uhc will also watch for file changes (using chokidar) in src directory and will
+  recompile and reload the browser (using live-server) on changes.
+
+- PORT can be passed as environment variable.
 
 # Config
 
@@ -48,7 +50,7 @@ recompile and reload the browser (using live-server) on changes.
 - by default uhc will look for uhc.config.json in current working directory.
   use `-c` to pass a custom path. (Not Recommended yet!)
 - all other paths should be relative to src and build dir accordingly.
-- load env variables from .env
+- get environment variables from .env with load key.
 
 ```json
 {

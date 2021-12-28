@@ -25,12 +25,91 @@ globalThis.error = (str) => {
   throw red("[ERROR] ") + str;
 };
 
-dotenv.config();
-let config_path = "uhc.config.json";
-const { words, options } = checkArgs(process.argv.splice(2));
-log(bold("UHC 1.4.0"));
+const version = loadJson("../package.json").version;
 
-init();
+try {
+  log(bold("UHC " + version));
+  dotenv.config();
+  await checkArgs();
+} catch (e) {
+  console.error(e);
+}
+
+async function checkArgs() {
+  let config_path = "uhc.config.json";
+  const { words, options } = parseArgs(process.argv.splice(2));
+
+  for (const option in options) {
+    switch (option) {
+      case "g":
+        return generateConfig();
+      case "c":
+        config_path = options[option] == true ? config_path : options[option];
+        break;
+      case "w":
+        if (options[option] == true) error("watch path required");
+        loadConfig(config_path);
+        return await watchDir(options[option]);
+      case "h":
+        return help();
+    }
+  }
+
+  loadConfig(config_path);
+  for (const word of words) {
+    switch (word) {
+      case "dev":
+        const port = process.env.PORT || 8080;
+        liveServer.start({
+          port: port,
+          root: build,
+          file: ".",
+          open: false,
+          logLevel: 2,
+        });
+        return await watchDir(src);
+    }
+  }
+  init();
+}
+
+function loadConfig(config_path) {
+  // get config
+  config_path = "./" + config_path;
+  if (!existsSync(config_path))
+    error(config_path + " doesn't exists. use -g to generate a config file.");
+
+  globalThis.config = JSON.parse(readFileSync(config_path));
+  checkVersion(config.uhc);
+
+  if (!config.src_dir) error("src dir not specified!");
+  if (!config.build_dir) error("build dir not specified!");
+  globalThis.src = resolve(config_path, "../" + config.src_dir);
+  globalThis.build = resolve(config_path, "../" + config.build_dir);
+
+  if (config.template)
+    globalThis.template = readFileSync(resolve(src, config.template), "utf-8");
+  if (!config.routes) error("routes not specified");
+  if (!Object.keys(config.routes).length) error("at least one route required");
+
+  if (config.load) {
+    if (!config.vars) config.vars = {};
+    for (const key of config.load) {
+      if (!process.env[key]) warn("env var " + key + " is not defined");
+      config.vars[key] = process.env[key];
+    }
+  }
+}
+
+async function init() {
+  try {
+    await compile(config.routes);
+    log(grey("compiled successfully!"));
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 async function watchDir(path) {
   if (!existsSync(path)) error(path + " path doesn't exits");
   log(green('"r" to recompile or "q" to quit'));
@@ -52,84 +131,8 @@ async function watchDir(path) {
   chokidar.watch(path).on("all", (event, path) => {
     if (!compile_on_change) return;
     log(green(event + " : " + basename(path)));
-    init(true);
+    init();
   });
-}
-
-async function init(watch) {
-  try {
-    if (!watch) {
-      for (const option in options) {
-        switch (option) {
-          case "g":
-            return generateConfig();
-          case "c":
-            config_path =
-              options[option] == true ? config_path : options[option];
-            break;
-          case "w":
-            if (options[option] == true) error("watch path required");
-            return await watchDir(options[option]);
-          case "h":
-            return help();
-        }
-      }
-    }
-
-    // get config
-    config_path = "./" + config_path;
-    if (!existsSync(config_path))
-      error(
-        config_path +
-          " doesn't exists. use -g to generate config file or use -c to link your config file"
-      );
-
-    globalThis.config = JSON.parse(readFileSync(config_path));
-
-    if (!config.src_dir) error("src dir not specified!");
-    if (!config.build_dir) error("build dir not specified!");
-    globalThis.src = resolve(config_path, "../" + config.src_dir);
-    globalThis.build = resolve(config_path, "../" + config.build_dir);
-
-    // dev
-    if (!watch) {
-      for (const word of words) {
-        switch (word) {
-          case "dev":
-            const port = process.env.PORT || 8080;
-            log(build)
-            liveServer.start({
-              port: port,
-              root: build,
-              file: ".",
-              open: false,
-              logLevel: 2,
-            });
-            return await watchDir(src);
-        }
-      }
-    }
-
-    if (config.template)
-      globalThis.template = readFileSync(
-        resolve(src, config.template),
-        "utf-8"
-      );
-    if (!config.routes) error("routes not specified");
-    if (!Object.keys(config.routes).length)
-      error("at least one route required");
-
-    if (config.load) {
-      if (!config.vars) config.vars = {};
-      for (const key of config.load) {
-        if (!process.env[key]) warn("env var " + key + " is not defined");
-        config.vars[key] = process.env[key];
-      }
-    }
-    await compile(config.routes);
-  } catch (e) {
-    console.error(e);
-  }
 }
 
 async function compile(routes, dir_path = "") {
@@ -143,7 +146,6 @@ async function compile(routes, dir_path = "") {
 
         const from = resolve(src, input_file);
         const to = resolve(build, dir_path + route);
-        globalThis.from_dir = resolve(from, "../");
 
         await compileRoute(from, to);
         break;
@@ -158,6 +160,7 @@ async function compile(routes, dir_path = "") {
 }
 
 async function compileRoute(from, to) {
+  const from_dir = resolve(from, "../");
   let [html, css] = parseIndex(from);
 
   if (config.css) {
@@ -196,7 +199,10 @@ async function compileRoute(from, to) {
 
   //html
   write(html.replace(/<\/head\s*>/, `<style>` + css + `</style></head>`), to);
-  log(grey("Compiled successfully!"));
+}
+
+function loadJson(path) {
+  return JSON.parse(readFileSync(new URL(path, import.meta.url)));
 }
 
 function write(content, path, isNotRelative) {
@@ -206,7 +212,7 @@ function write(content, path, isNotRelative) {
   });
 }
 
-function checkArgs(args) {
+function parseArgs(args) {
   const options = {};
   const words = [];
 
@@ -229,9 +235,27 @@ function generateConfig() {
   const data = readFileSync(
     new URL("../uhc.config.json.swp", import.meta.url),
     "utf-8"
-  );
+  ).replace("<uhc_version>", version);
   write(data, "uhc.config.json");
+  log(green("uhc.config.json generated"));
 }
 function help() {
   log(readFileSync(new URL("../help.txt", import.meta.url), "utf-8"));
+}
+function checkVersion(ver) {
+  if (!ver)
+    return warn(
+      "using a much lower config version than recommended, update to 1.5 or heigher"
+    );
+  if (ver == version) return;
+
+  ver = ver.split(".").slice(0, 2).map(Number);
+  const config_version = version.split(".").slice(0, 2).map(Number);
+
+  for (let i = 0; i < 2; i++) {
+    if (ver[i] < config_version[i])
+      return warn("using a higher version than mentioned in config");
+    else if (ver[i] > config_version[i])
+      return warn("using a lower version than mentioned in config");
+  }
 }
