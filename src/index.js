@@ -2,9 +2,10 @@
 
 import { bold, grey, red, green, yellow } from "btss";
 import { resolve } from "path";
+import { exec } from "child_process";
 import { createInterface } from "readline";
 import { basename } from "path";
-import { readFileSync, writeFile, watch, mkdirSync, existsSync } from "fs";
+import { readFileSync, rm, writeFile, watch, mkdirSync, existsSync } from "fs";
 import parseIndex from "./parser.js";
 
 import sass from "sass";
@@ -55,10 +56,10 @@ async function checkArgs() {
     }
   }
 
-  loadConfig(config_path);
-  for (const word of words) {
+  for (const [index, word] of words.entries()) {
     switch (word) {
       case "dev":
+        loadConfig(config_path);
         const port = process.env.PORT || 8080;
         liveServer.start({
           port: port,
@@ -68,8 +69,30 @@ async function checkArgs() {
           logLevel: 2,
         });
         return await watchDir(src);
+      case "init":
+        const name = words[index + 1] || "uhc-app";
+        exec(
+          "git clone https://github.com/AyushmanTripathy/uhc-template " + name,
+          (err, stdout, stderr) => {
+            if (err) return log(err.message);
+            rm(name + "/.git", { recursive: true }, (err) => {
+              if (err) {
+                warn("error while removing .git");
+                log(err.message);
+              }
+            });
+            // the *entire* stdout and stderr (buffered)
+            if (stdout) log(stdout);
+            if (stderr) log(stderr);
+          }
+        );
+        return;
+      default:
+        error("unknown command " + word);
+        return;
     }
   }
+  loadConfig(config_path);
   init();
 }
 
@@ -198,7 +221,7 @@ async function compileRoute(from, to) {
   }
 
   //html
-  write(html.replace(/<\/head\s*>/, `<style>` + css + `</style></head>`), to);
+  write(html.replace("%head%", `<style>${css}</style>`), to);
 }
 
 function loadJson(path) {

@@ -9,6 +9,7 @@ echo '1. update docs'
 echo '2. reflected changes in todo.txt'
 echo '3. changed uhc.config.json.swp'
 echo '4. change CHANGELOG.md'
+echo '5. update the uhc template and change config version'
 echo 'confirm pusblish?'
 read null
 echo 'commit version code'
