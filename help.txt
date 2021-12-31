@@ -1,5 +1,5 @@
-UHC (the useful html compiler)
--------------------------------
+the useful html compiler
+------------------------
 
 options
   -h : help
@@ -9,6 +9,7 @@ options
 
 commands
   dev : watch src dir, recompile on changes with live-server.
+  init : create a skeleton uhc app.
 
 uhc <command>
 

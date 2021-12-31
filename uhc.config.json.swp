@@ -1,4 +1,5 @@
 {
+  "uhc": "<uhc_version>",
   "src_dir": "src",
   "build_dir": "public",
   "template": "template.html",
@@ -7,6 +8,7 @@
     "prefix": "@import \"./global.scss\";",
     "sass": true 
   },
+  "load": ["KEYS"],
   "vars": {
     "foo": "bar"
   },

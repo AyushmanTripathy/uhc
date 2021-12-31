@@ -35,11 +35,21 @@ why?
 | c      | load config              |
 | w      | watch path               |
 
-# Dev mode
+## commands
 
-run `uhc dev` and see your site on [localhost:8080](http://localhost:8080/),
-uhc will also watch for file changes (using chokidar) in src directory and will
-recompile and reload the browser (using live-server) on changes.
+### Init
+
+- run `uhc init` to create a skeleton uhc app.
+- by default it creates a dir named uhc-app, run `uhc init <name>` to pass
+  a name.
+
+### Dev
+
+- run `uhc dev` and see your site on [localhost:8080](http://localhost:8080/),
+  uhc will also watch for file changes (using chokidar) in src directory and will
+  recompile and reload the browser (using live-server) on changes.
+
+- PORT can be passed as environment variable.
 
 # Config
 
@@ -48,9 +58,11 @@ recompile and reload the browser (using live-server) on changes.
 - by default uhc will look for uhc.config.json in current working directory.
   use `-c` to pass a custom path. (Not Recommended yet!)
 - all other paths should be relative to src and build dir accordingly.
+- get environment variables from .env with load key.
 
 ```json
 {
+  "uhc": "<uhc_version>",
   "src_dir": "src",
   "build_dir": "public",
   "template": "template.html",
@@ -59,6 +71,7 @@ recompile and reload the browser (using live-server) on changes.
     "prefix": "@import \"./global.scss\";",
     "sass": true
   },
+  "load": ["KEYS"],
   "vars": {
     "foo": "bar"
   },
@@ -164,7 +177,6 @@ build/
 - template are used share code across diffrent routes.
 - templates must have a body and head tag where compiled code is injected.
 - templates itself will not be compiled.
-- templates are optional.
 
 ```
 "template":"template.html",

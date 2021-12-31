@@ -1,5 +1,31 @@
 # CHANGELOG FOR UHC
 
+## 1.6.0
+
+## ADDED
+
+- init command
+- added %head% %body% in template
+
+## CHANGES
+
+- removed template optional support.
+
+## 1.5.0
+
+### ADDED
+
+- added version check
+- load environment vars
+
+### CHANGES
+
+- reorganised init function into init, checkArgs and loadConfig.
+
+## 1.4.1
+
+- update to btss 1.1.0
+
 ## 1.4.0
 
 ### ADDED

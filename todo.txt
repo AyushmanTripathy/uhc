@@ -5,7 +5,5 @@ TODO
 
 add class name sometimes not giving class name to a,p,span
 template scss is not processed
-write docs
-  change help.txt
 loops
   fix checkLoops infintie loop

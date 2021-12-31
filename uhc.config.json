@@ -5,8 +5,9 @@
   "css": {
     "autoprefix": true,
     "prefix": "@import \"./mixins.scss\";",
-    "sass": true 
+    "sass": true
   },
+  "load": ["KEY"],
   "vars": {
     "foo": "bar"
   },
