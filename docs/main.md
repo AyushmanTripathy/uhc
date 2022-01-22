@@ -83,17 +83,15 @@ why?
 
 # Component format
 
-- stylesheets linked are not compiled.
-- styles in components are encapsulated, so you don't have to guess selectors.
-- css are collected and then sass and postcss are applied afterwards.
+- stylesheets added using link tag are not compiled.
 - load path for sass is the index file.
-- if no template is specified, main component must have head and body tags.
 - an example component
 
 ```html
 <style>
+  // css or sass styles
   main {
-    // css or sass styles
+    color: red;
   }
 </style>
 
@@ -105,6 +103,8 @@ why?
 ```
 
 # Importing
+
+- import component using import tag.
 
 ```html
 <import path="./component" />
@@ -177,6 +177,7 @@ build/
 - template are used share code across diffrent routes.
 - templates must have a body and head tag where compiled code is injected.
 - templates itself will not be compiled.
+- compiled code will replace %head% & %body% respectively.
 
 ```
 "template":"template.html",
@@ -192,10 +193,10 @@ build/
     <link rel="icon" href="./icon.png" />
     <link rel="stylesheet" href="./global.css" />
     <title>Website</title>
-    // compiled css will be injected here.
+    %head%
   </head>
   <body>
-    // compiled html and js will be injected here.
+    %body%
   </body>
 </html>
 ```

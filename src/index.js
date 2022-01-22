@@ -153,6 +153,7 @@ async function watchDir(path) {
 
   chokidar.watch(path).on("all", (event, path) => {
     if (!compile_on_change) return;
+    globalThis.template = readFileSync(resolve(src, config.template), "utf-8");
     log(green(event + " : " + basename(path)));
     init();
   });

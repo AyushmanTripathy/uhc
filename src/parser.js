@@ -1,4 +1,4 @@
-import { readFileSync } from "fs";
+import { readFileSync, existsSync } from "fs";
 import { resolve } from "path";
 
 export default function parseIndex(path) {
@@ -45,29 +45,24 @@ function parse(path, vars = {}, index) {
   file = file.replaceAll(/\/\*(.||\n)*\*\//g, "");
 
   let css = "";
-  [file, css] = parseCss(file, class_name);
-  //file = checkLoops(file);
-  file = addClassName(file, class_name);
   if (config.vars != false) file = checkVars(file, vars);
+  [file, css] = parseCss(file, class_name);
+  file = addClassName(file, class_name);
+  file = checkLoops(file);
+  log(file)
   const temp = checkImports(file, vars, path);
   temp[1] += css;
   return temp;
 }
 
 function checkLoops(file) {
-  let loop = file.match(new RegExp("<loop(.||\n)*</loop( )*>", ""));
-  if (loop) {
-    loop = loop[0];
-    log(loop);
-    const count = checkAttributes(loop).count;
-    if (!count) error("count not specified for loop\n" + loop);
-    file = file.replace(
-      loop,
-      loop
-        .replace(/<\/loop(\s)*>/, "")
-        .replace(/<loop(.||\n)[^>]*>/, "")
-        .repeat(count)
-    );
+  let matches = file.match(new RegExp("\(.*\)\s*{(.||\n)[^{}]*}", "g"));
+  if (matches) {
+    for(const loop of matches) {
+      const count = Number(loop.match(/\(.*\)/)[0].slice(1,-1))
+      const content = loop.match(/{(.||\n)*}/)[0].slice(1,-1).repeat(count)
+      file = file.replace(loop,content)
+    }
     return checkLoops(file);
   } else return file;
 }
@@ -131,6 +126,8 @@ function checkImports(file, variables, path) {
     for (const imp of imports) {
       const vars = checkAttributes(imp);
       if (!vars.path) error("path not specified for import\n" + imp);
+      if (!existsSync(import_path(vars.path,path)))
+        error("no such file " + import_path(vars.path,path) + "\n" + imp);
       const [html, styles] = parse(import_path(vars.path, path), {
         ...vars,
         ...variables,

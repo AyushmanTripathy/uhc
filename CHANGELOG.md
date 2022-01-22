@@ -1,5 +1,10 @@
 # CHANGELOG FOR UHC
 
+## 1.7.0
+## ADDED
+- refresh template on recompile.
+- check path before importing.
+## CHANGES
 ## 1.6.0
 
 ## ADDED

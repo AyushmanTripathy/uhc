@@ -18,6 +18,6 @@ stuck? read the docs!
 
 plz create an issue to report any bugs
 or recommend us features we should add.
- https://github.com/AyushmanTripathy/uhc/issues 
+  https://github.com/AyushmanTripathy/uhc/issues 
 
 thank you for using uhc!
