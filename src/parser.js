@@ -59,8 +59,10 @@ function checkLoops(file) {
   let matches = file.match(new RegExp("\(.*\)\s*{(.||\n)[^{}]*}", "g"));
   if (matches) {
     for(const loop of matches) {
-      const count = Number(loop.match(/\(.*\)/)[0].slice(1,-1))
-      const content = loop.match(/{(.||\n)*}/)[0].slice(1,-1).repeat(count)
+      let count = loop.match(/\(.*\)/)[0].slice(1,-1)
+      let content = loop.match(/{(.||\n)*}/)[0].slice(1,-1);
+      if (Number(count)) content = content.repeat(count)
+      else if(!eval(count)) content = "";
       file = file.replace(loop,content)
     }
     return checkLoops(file);
