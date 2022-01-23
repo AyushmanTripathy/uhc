@@ -1,5 +1,6 @@
-import { readFileSync } from "fs";
+import { readFileSync, existsSync } from "fs";
 import { resolve } from "path";
+import { runInContext, createContext } from "vm";
 
 export default function parseIndex(path) {
   let file = readFileSync(path, "utf-8");
@@ -42,33 +43,47 @@ function parse(path, vars = {}, index) {
   path = resolve(path, "../");
 
   //comments
-  file = file.replaceAll(/\/\*(.||\n)*\*\//g, "");
+  if (config.comments != false) file = file.replaceAll(/\/\*(.||\n)*\*\//g, "");
+
+  let js = "";
+  const scripts = file.match(
+    new RegExp("<script(.||\n)[^>]*>(.||\n)*</script( )*>", "g")
+  );
+  if (scripts) {
+    for (const script of scripts) {
+      js += script;
+      file = file.replace(script, "");
+    }
+  }
 
   let css = "";
+  if (config.vars != false) file = parseBlock(file, vars);
   [file, css] = parseCss(file, class_name);
-  //file = checkLoops(file);
   file = addClassName(file, class_name);
-  if (config.vars != false) file = checkVars(file, vars);
+  if (config.statments != false) file = parseStatments(file, vars);
+
   const temp = checkImports(file, vars, path);
   temp[1] += css;
+  temp[0] += js;
   return temp;
 }
 
-function checkLoops(file) {
-  let loop = file.match(new RegExp("<loop(.||\n)*</loop( )*>", ""));
-  if (loop) {
-    loop = loop[0];
-    log(loop);
-    const count = checkAttributes(loop).count;
-    if (!count) error("count not specified for loop\n" + loop);
-    file = file.replace(
-      loop,
-      loop
-        .replace(/<\/loop(\s)*>/, "")
-        .replace(/<loop(.||\n)[^>]*>/, "")
-        .repeat(count)
-    );
-    return checkLoops(file);
+function parseStatments(file, vars) {
+  let matches = file.match(/\((.||\n)[^\(\)]*\)\s*{(.||\n)[^{}]*}/g);
+  if (matches) {
+    for (const loop of matches) {
+      let count = loop.match(/\((.||\n)[^\(\)]*\)/)[0].slice(1, -1);
+      let content = loop.match(/{(.||\n)*}/)[0].slice(1, -1);
+      try {
+        count = run(count, vars);
+      } catch (e) {
+        error(`while executing (${count})\n ${e.message}`);
+      }
+      if (Number(count)) content = content.repeat(count);
+      else if (!count) content = "";
+      file = file.replace(loop, content);
+    }
+    return parseStatments(file, vars);
   } else return file;
 }
 
@@ -112,16 +127,25 @@ function parseCss(file, class_name) {
   return [file, css];
 }
 
-function checkVars(file, vars) {
-  const statments = file.match(/\${(.)[^}]*}/g);
+function parseBlock(file, vars) {
+  const statments = file.match(/\${(.||\n)[^}]*}/g);
   if (statments) {
     for (const statment of statments) {
-      const var_name = statment.slice(2, -1).trim();
-      if (!vars[var_name]) warn(var_name + " is not defined");
-      file = file.replace(statment, vars[var_name]);
+      const code = statment.slice(2, -1).trim();
+      try {
+        file = file.replace(statment, run(code, vars));
+      } catch (e) {
+        error("while executing " + code + "\n" + e.message);
+      }
     }
   }
   return file;
+}
+
+function run(code, context) {
+  createContext(context);
+  runInContext(`x_=${code}`, context);
+  return context.x_;
 }
 
 function checkImports(file, variables, path) {
@@ -131,6 +155,8 @@ function checkImports(file, variables, path) {
     for (const imp of imports) {
       const vars = checkAttributes(imp);
       if (!vars.path) error("path not specified for import\n" + imp);
+      if (!existsSync(import_path(vars.path, path)))
+        error("no such file " + import_path(vars.path, path) + "\n" + imp);
       const [html, styles] = parse(import_path(vars.path, path), {
         ...vars,
         ...variables,

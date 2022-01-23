@@ -1,4 +1,5 @@
 {
+  "uhc": "1.7.0",
   "src_dir": "test",
   "build_dir": "build",
   "template": "template.html",
@@ -7,7 +8,6 @@
     "prefix": "@import \"./mixins.scss\";",
     "sass": true
   },
-  "load": ["KEY"],
   "vars": {
     "foo": "bar"
   },

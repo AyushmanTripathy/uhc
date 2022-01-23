@@ -1,6 +1,6 @@
 {
   "name": "uhc",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "the useful html compiler",
   "main": "src/index.js",
   "type": "module",
@@ -8,18 +8,21 @@
     "uhc": "src/index.js"
   },
   "scripts": {
-    "dev": "nodemon src/index.js",
-    "test": "uhc"
+    "dev": "nodemon src/index.js"
   },
   "author": "Ayushman Tripathy",
-  "keywords": ["html", "css", "compiler"],
+  "keywords": [
+    "html",
+    "css",
+    "compiler"
+  ],
   "license": "MIT",
   "dependencies": {
     "autoprefixer": "^10.4.0",
-    "btss": "^1.1.0",
+    "btss": "1.1.0",
     "chokidar": "^3.5.2",
     "dotenv": "^10.0.0",
-    "live-server": "^1.2.1",
+    "live-server": "1.2.1",
     "postcss": "^8.4.5",
     "sass": "^1.45.0"
   }

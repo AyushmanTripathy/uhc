@@ -5,7 +5,7 @@ error(){
   exit 1
 }
 
-echo '1. update docs'
+echo '1. update docs && recompile'
 echo '2. reflected changes in todo.txt'
 echo '3. changed uhc.config.json.swp'
 echo '4. change CHANGELOG.md'
