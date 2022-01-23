@@ -1,14 +1,7 @@
 DONE
 ----
-template not reloading in dev mode
-import file exists error
-loop
-
 TODO
 ----
 
-
 change readme
 add class name sometimes not giving class name to a,p,span
-loops
-  fix checkLoops infintie loop

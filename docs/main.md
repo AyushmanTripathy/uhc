@@ -1,6 +1,6 @@
-# Introduction
+<img src="../icon.png" alt="uhc">
 
-UHC, the useful html compiler, for when you don't need a javascript framework.
+for when you don't need a javascript framework.
 
 why?
 
@@ -13,15 +13,16 @@ why?
 - variables
 
 ```html
-<p>hello ${foo}</p>
+<p>hello ${ foo + "something" }</p>
 ```
 
+- conditional flow & loops
 - routing made easy.
 - no need to involve npm, just install uhc globally.
 - don't waste time on multiple configs just one, uhc.config.json.
 - install just one package, no need to manage plugins.
 - sass && postcss support.
-- `/ ** /` comments
+- `/**/` comments
 
 # Cli
 
@@ -35,7 +36,7 @@ why?
 | c      | load config              |
 | w      | watch path               |
 
-## commands
+## Commands
 
 ### Init
 
@@ -81,6 +82,14 @@ why?
 }
 ```
 
+- some functions can be disabled by setting property to false in uhc.config.json.
+
+| functions            | property  |
+| -------------------- | --------- |
+| variables            | vars      |
+| if statments & loops | statments |
+| comments             | comments  |
+
 # Component format
 
 - stylesheets added using link tag are not compiled.
@@ -113,6 +122,7 @@ why?
 # Variables
 
 - variables can be used by `${}` syntax.
+- `${}` can perform javascript.
 
 ```html
 <p>hello ${ foo }</p>
@@ -127,17 +137,34 @@ why?
 },
 ```
 
-- vars can be passed to component from then import tag.
+- vars can be passed to component from import tag.
 - components inherit vars from thier parents.
 
 ```html
 <import path="./component" foo="bar" />
 ```
 
-#### NOTE
+# Conditional Flow
 
-- uhc is a compiler so `${}` cannot perform any math or logic.
-- `${}` cannot contain `\n`.
+- `(){}` syntax become an if statment if input is a boolean.
+
+```html
+(10 == n) {
+<p>hello world</p>
+}
+```
+
+- else if / else are not supported yet. coming soon.
+
+# Loops
+
+- `(){}` syntax becomes an loop if input is a number.
+
+```html
+(n) {
+<p>hello world</p>
+}
+```
 
 # Routes
 

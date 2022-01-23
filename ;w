@@ -4,6 +4,7 @@
 
 ## ADDED
 
+- refresh template on recompile.
 - check path before importing.
 - conditional flow
 - add javascript in ${}
@@ -12,7 +13,6 @@
 ## CHANGES
 
 - parse script tags separate from html.
-- refresh template on recompile.
 
 ## 1.6.0
 

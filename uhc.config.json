@@ -1,12 +1,12 @@
 {
-  "uhc": "1.6.0",
+  "uhc": "1.7.0",
   "src_dir": "test",
   "build_dir": "build",
   "template": "template.html",
   "css": {
     "autoprefix": true,
     "prefix": "@import \"./mixins.scss\";",
-    "sass": true 
+    "sass": true
   },
   "vars": {
     "foo": "bar"

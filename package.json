@@ -1,6 +1,6 @@
 {
   "name": "uhc",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "description": "the useful html compiler",
   "main": "src/index.js",
   "type": "module",
@@ -8,8 +8,7 @@
     "uhc": "src/index.js"
   },
   "scripts": {
-    "dev": "nodemon src/index.js",
-    "test": "uhc"
+    "dev": "nodemon src/index.js"
   },
   "author": "Ayushman Tripathy",
   "keywords": [
