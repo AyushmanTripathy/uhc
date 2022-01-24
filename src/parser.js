@@ -14,9 +14,8 @@ export default function parseIndex(path) {
       css += styles;
     }
   }
-
   if (!config.template) {
-    error("templates are no longer optional 1.6.0 and higher.");
+    error("templates are no longer optional in 1.6.0 and higher.");
   } else {
     checkTemplate(template, config.template);
     const temp = parse(path, config.vars, css + file);
@@ -26,17 +25,6 @@ export default function parseIndex(path) {
     return [file, css];
   }
 }
-
-function checkTemplate(file, path) {
-  let body = file.match(new RegExp("%body%", "g"));
-  if (!body) warn("%body% not found in " + path);
-  else if (body.length - 1) warn("multiple %body% found in " + path);
-
-  let head = file.match(new RegExp("%head%", "g"));
-  if (!head) warn("%head% not found in " + path);
-  else if (head.length - 1) warn("multiple %head% found in " + path);
-}
-
 function parse(path, vars = {}, index) {
   const class_name = "uhc" + hash();
   let file = index ? index : readFileSync(path, "utf-8");
@@ -67,6 +55,17 @@ function parse(path, vars = {}, index) {
   temp[0] += js;
   return temp;
 }
+function checkTemplate(file, path) {
+  let body = file.match(new RegExp("%body%", "g"));
+  if (!body) warn("%body% not found in " + path);
+  else if (body.length - 1) warn("multiple %body% found in " + path);
+
+  let head = file.match(new RegExp("%head%", "g"));
+  if (!head) warn("%head% not found in " + path);
+  else if (head.length - 1) warn("multiple %head% found in " + path);
+}
+
+
 
 function parseStatments(file, vars) {
   let matches = file.match(/\((.||\n)[^\(\)]*\)\s*{(.||\n)[^{}]*}/g);
@@ -88,19 +87,19 @@ function parseStatments(file, vars) {
 }
 
 function addClassName(file, class_name) {
-  const tags = file.match(new RegExp("<[^/](.||\n)[^>]*/*>", "g"));
-  if (tags) {
-    for (const tag of tags) {
-      if (tag.includes("class="))
+  const headTags = file.match(new RegExp("<[^/](.||\n)[^<>]*/*>", "g"));
+  if (headTags) {
+    for (const headTag of headTags) {
+      if (headTag.includes("class="))
         file = file.replace(
-          tag,
-          tag.replace('class="', ` class="${class_name} `)
+          headTag,
+          headTag.replace('class="', ` class="${class_name} `)
         );
       else {
-        const temp = tag.endsWith("/>") ? "/>" : ">";
+        const temp = headTag.endsWith("/>") ? "/>" : ">";
         file = file.replace(
-          tag,
-          tag.replace(temp, ` class="${class_name}"${temp}`)
+          headTag,
+          headTag.replace(temp, ` class="${class_name}"${temp}`)
         );
       }
     }

@@ -1,7 +1,8 @@
 DONE
 ----
+add class name sometimes not giving class name to a,p,span
+
 TODO
 ----
 
 change readme
-add class name sometimes not giving class name to a,p,span
