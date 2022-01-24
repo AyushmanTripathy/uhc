@@ -8,7 +8,6 @@
     "prefix": "@import \"./global.scss\";",
     "sass": true 
   },
-  "load": ["KEYS"],
   "vars": {
     "foo": "bar"
   },

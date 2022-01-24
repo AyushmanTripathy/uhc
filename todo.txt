@@ -1,8 +1,5 @@
 DONE
 ----
-add class name sometimes not giving class name to a,p,span
-
 TODO
 ----
-
-change readme
+fix live-server error

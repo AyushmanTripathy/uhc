@@ -1,19 +1,12 @@
 #!/usr/bin/env node
 
-import { bold, grey, red, green, yellow } from "btss";
-import { resolve } from "path";
-import { exec } from "child_process";
+import { bold, red, green, yellow } from "btss";
 import { createInterface } from "readline";
-import { basename } from "path";
-import { readFileSync, rm, writeFile, watch, mkdirSync, existsSync } from "fs";
-import parseIndex from "./parser.js";
+import { exec } from "child_process";
+import { resolve, basename } from "path";
+import { rm, existsSync, writeFile, readFileSync } from "fs";
 
-import sass from "sass";
-import postcss from "postcss";
 import dotenv from "dotenv";
-import chokidar from "chokidar";
-import liveServer from "live-server";
-import autoprefixer from "autoprefixer";
 
 globalThis.hash_no = 0;
 globalThis.log = (str) => console.log(str);
@@ -26,114 +19,92 @@ globalThis.error = (str) => {
   throw red("[ERROR] ") + str;
 };
 
-const version = loadJson("../package.json").version;
+globalThis.version = loadJson("../package.json").version;
 
-try {
-  log(bold("UHC " + version));
-  dotenv.config();
-  await checkArgs();
-} catch (e) {
-  console.error(e);
+init();
+async function init() {
+  try {
+    log(bold("UHC " + version));
+
+    let config_path = "uhc.config.json";
+    const { words, options } = parseArgs(process.argv.splice(2));
+    dotenv.config();
+
+    // watch function test
+    const temp = await checkArgs(options, config_path);
+    if (!temp) return;
+    else if (temp != 1) config_path = temp;
+
+    if (!words.length) {
+      const { init: compile, loadConfig } = await import("./core.js");
+      loadConfig(config_path);
+      await compile();
+    } else await checkCommands(words, config_path);
+  } catch (e) {
+    console.error(e);
+    process.exit(1);
+  }
 }
 
-async function checkArgs() {
-  let config_path = "uhc.config.json";
-  const { words, options } = parseArgs(process.argv.splice(2));
-
+async function checkArgs(options, config_path) {
   for (const option in options) {
     switch (option) {
       case "g":
         return generateConfig();
       case "c":
         config_path = options[option] == true ? config_path : options[option];
-        break;
+        return config_path;
       case "w":
+        const { init: compile, loadConfig } = await import("./core.js");
         if (options[option] == true) error("watch path required");
         loadConfig(config_path);
-        return await watchDir(options[option]);
+        return await watchDir(options[option], compile);
       case "h":
         return help();
-    }
-  }
-
-  for (const [index, word] of words.entries()) {
-    switch (word) {
-      case "dev":
-        loadConfig(config_path);
-        const port = process.env.PORT || 8080;
-        liveServer.start({
-          port: port,
-          root: build,
-          file: ".",
-          open: false,
-          logLevel: 2,
-        });
-        return await watchDir(src);
-      case "init":
-        const name = words[index + 1] || "uhc-app";
-        exec(
-          "git clone https://github.com/AyushmanTripathy/uhc-template " + name,
-          (err, stdout, stderr) => {
-            if (err) return log(err.message);
-            rm(name + "/.git", { recursive: true }, (err) => {
-              if (err) {
-                warn("error while removing .git");
-                log(err.message);
-              }
-            });
-            // the *entire* stdout and stderr (buffered)
-            if (stdout) log(stdout);
-            if (stderr) log(stderr);
-          }
-        );
-        return;
       default:
-        error("unknown command " + word);
-        return;
+        return error("unknown option " + option);
     }
   }
-  loadConfig(config_path);
-  init();
+  return 1;
 }
 
-function loadConfig(config_path) {
-  // get config
-  config_path = "./" + config_path;
-  if (!existsSync(config_path))
-    error(config_path + " doesn't exists. use -g to generate a config file.");
-
-  globalThis.config = JSON.parse(readFileSync(config_path));
-  checkVersion(config.uhc);
-
-  if (!config.src_dir) error("src dir not specified!");
-  if (!config.build_dir) error("build dir not specified!");
-  globalThis.src = resolve(config_path, "../" + config.src_dir);
-  globalThis.build = resolve(config_path, "../" + config.build_dir);
-
-  if (config.template)
-    globalThis.template = readFileSync(resolve(src, config.template), "utf-8");
-  if (!config.routes) error("routes not specified");
-  if (!Object.keys(config.routes).length) error("at least one route required");
-
-  if (config.load) {
-    if (!config.vars) config.vars = {};
-    for (const key of config.load) {
-      if (!process.env[key]) warn("env var " + key + " is not defined");
-      config.vars[key] = process.env[key];
-    }
+async function checkCommands(words, config_path) {
+  switch (words[0]) {
+    case "dev":
+      const { init: compile, loadConfig } = await import("./core.js");
+      loadConfig(config_path);
+      const port = process.env.PORT || 8080;
+      const { default: liveServer } = await import("live-server");
+      liveServer.start({
+        port: port,
+        root: build,
+        file: ".",
+        open: false,
+        logLevel: 2,
+      });
+      return await watchDir(src, compile);
+    case "init":
+      const name = words[1] || "uhc-app";
+      return exec(
+        "git clone https://github.com/AyushmanTripathy/uhc-template " + name,
+        (err, stdout, stderr) => {
+          if (err) return log(err.message);
+          rm(name + "/.git", { recursive: true }, (err) => {
+            if (err) {
+              warn("error while removing .git");
+              log(err.message);
+            }
+          });
+          if (stdout) log(stdout);
+          if (stderr) log(stderr);
+        }
+      );
+    default:
+      error("unknown command " + words[0]);
   }
 }
 
-async function init() {
-  try {
-    await compile(config.routes);
-    log(grey("compiled successfully!"));
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-async function watchDir(path) {
+async function watchDir(path, compile) {
   if (!existsSync(path)) error(path + " path doesn't exits");
   log(green('"r" to recompile or "q" to quit'));
 
@@ -142,7 +113,7 @@ async function watchDir(path) {
     output: process.stdout,
     terminal: true,
   }).on("line", (data) => {
-    if (data == "r") init(true);
+    if (data == "r") compile();
     else if (data == "q") process.exit();
   });
 
@@ -151,89 +122,17 @@ async function watchDir(path) {
     compile_on_change = true;
   }, 500);
 
-  chokidar.watch(path).on("all", (event, path) => {
+  const { watch } = await import("chokidar");
+  watch(path).on("all", (event, path) => {
     if (!compile_on_change) return;
     globalThis.template = readFileSync(resolve(src, config.template), "utf-8");
     log(green(event + " : " + basename(path)));
-    init();
+    compile();
   });
-}
-
-async function compile(routes, dir_path = "") {
-  for (let route in routes) {
-    switch (typeof routes[route]) {
-      case "string":
-        const input_file = routes[route];
-        if (route.startsWith("/")) route = route.slice(1);
-        if (!route) route = "index.html";
-        if (!route.endsWith(".html")) route += ".html";
-
-        const from = resolve(src, input_file);
-        const to = resolve(build, dir_path + route);
-
-        await compileRoute(from, to);
-        break;
-      case "object":
-        // check for dir
-        const dir = resolve(config.build_dir, dir_path + route + "/");
-        if (!existsSync(dir)) mkdirSync(dir);
-        await compile(routes[route], dir_path + route + "/");
-        break;
-    }
-  }
-}
-
-async function compileRoute(from, to) {
-  const from_dir = resolve(from, "../");
-  let [html, css] = parseIndex(from);
-
-  if (config.css) {
-    css = css.replaceAll(/<\/style( )*>/g, "");
-    css = css.replaceAll(/<style(.||\n)[^<]*>/g, "");
-    if (config.css.prefix) css = config.css.prefix + css;
-  } else error("css configs not found");
-
-  const id = "/bundle" + hash() + ".css";
-  const to_dir = resolve(to, "../");
-
-  // sass
-  if (config.css.sass) {
-    try {
-      css = sass.compileString(css, {
-        loadPaths: [from_dir],
-      }).css;
-    } catch (e) {
-      return console.error(e.message);
-    }
-  }
-
-  const plugins = [];
-  if (config.css.autoprefix) plugins.push(autoprefixer);
-
-  // postcss
-  if (plugins.length) {
-    try {
-      const res = await postcss(plugins).process(css, { from: id.slice(1) });
-      if (res.map) write(res.map, to_dir + id + ".map");
-      css = res.css;
-    } catch (e) {
-      return console.error(e);
-    }
-  }
-
-  //html
-  write(html.replace("%head%", `<style>${css}</style>`), to);
 }
 
 function loadJson(path) {
   return JSON.parse(readFileSync(new URL(path, import.meta.url)));
-}
-
-function write(content, path, isNotRelative) {
-  path = isNotRelative ? "./" + path : path;
-  writeFile(path, content, (e) => {
-    if (e) error("couldn't write to " + path);
-  });
 }
 
 function parseArgs(args) {
@@ -255,31 +154,19 @@ function parseArgs(args) {
 
   return { options, words };
 }
+
 function generateConfig() {
   const data = readFileSync(
     new URL("../uhc.config.json.swp", import.meta.url),
     "utf-8"
   ).replace("<uhc_version>", version);
-  write(data, "uhc.config.json");
-  log(green("uhc.config.json generated"));
+
+  writeFile("./uhc.config.json", data, (e) => {
+    if (e) error("couldn't write to " + path);
+    else log(green("uhc.config.json generated"));
+  });
 }
+
 function help() {
   log(readFileSync(new URL("../help.txt", import.meta.url), "utf-8"));
-}
-function checkVersion(ver) {
-  if (!ver)
-    return warn(
-      "using a much lower config version than recommended, update to 1.5 or heigher"
-    );
-  if (ver == version) return;
-
-  ver = ver.split(".").slice(0, 2).map(Number);
-  const config_version = version.split(".").slice(0, 2).map(Number);
-
-  for (let i = 0; i < 2; i++) {
-    if (ver[i] < config_version[i])
-      return warn("using a higher version than mentioned in config");
-    else if (ver[i] > config_version[i])
-      return warn("using a lower version than mentioned in config");
-  }
 }

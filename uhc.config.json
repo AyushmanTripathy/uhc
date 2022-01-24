@@ -1,5 +1,5 @@
 {
-  "uhc": "1.7.0",
+  "uhc": "1.7.1",
   "src_dir": "test",
   "build_dir": "build",
   "template": "template.html",

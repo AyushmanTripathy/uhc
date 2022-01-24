@@ -1,33 +1,52 @@
-<img src="../icon.png" alt="uhc">
+# Introduction
 
-for when you don't need a javascript framework.
+UHC, The useful html compiler, for when you don't need a javascript framework.
 
-why?
+### Why?
 
-- importing components
+- html components.
 
 ```html
 <import path="./component.html" foo="bar" />
 ```
 
-- variables
+- variables.
 
 ```html
-<p>hello ${ foo + "something" }</p>
+<p>hello ${foo}</p>
 ```
 
-- conditional flow & loops
-- routing made easy.
-- no need to involve npm, just install uhc globally.
-- don't waste time on multiple configs just one, uhc.config.json.
-- install just one package, no need to manage plugins.
-- sass && postcss support.
-- `/**/` comments
+- conditional flow & loops.
+- basic html routing.
+- minimal configration needed.
+- sass and postcss support by default.
+- compiles to raw html.
+- and much much more!
+
+### How?
+
+1. install uhc globally
+
+```
+npm install uhc -g
+```
+
+2. start a new project
+
+- use a template
+
+```
+uhc init app_name
+```
+
+- or start from scratch with -g to generate uhc.config.json
+
+3. run `uhc` to compile.
+4. run `uhc dev` to start dev mode
 
 # Cli
 
-- use `npm i uhc -g` to install uhc.
-- `-c` option is still in development, usage is not recommended.
+### options
 
 | option | function                 |
 | ------ | ------------------------ |
@@ -54,10 +73,10 @@ why?
 
 # Config
 
-- uhc.config.json is one config you will ever need.
+- uhc.config.json should be placed in root directory.
 - use `uhc -g` to generate uhc.config.json.
 - by default uhc will look for uhc.config.json in current working directory.
-  use `-c` to pass a custom path. (Not Recommended yet!)
+  use `-c` to pass a custom path.
 - all other paths should be relative to src and build dir accordingly.
 - get environment variables from .env with load key.
 
@@ -125,7 +144,7 @@ why?
 - `${}` can perform javascript.
 
 ```html
-<p>hello ${ foo }</p>
+<p>hello ${ foo + "something" }</p>
 ```
 
 - vars can be globally declared from uhc.config.json.

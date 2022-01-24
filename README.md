@@ -16,10 +16,12 @@ UHC, the useful html compiler, for when you don't need a javascript framework.
 <p>hello ${foo}</p>
 ```
 
+- conditional flow & loops.
 - basic html routing.
 - minimal configration needed.
 - sass and postcss support by default.
 - compiles to raw html.
+- and much much more!
 
 ### How?
 

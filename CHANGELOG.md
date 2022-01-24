@@ -1,5 +1,15 @@
 # CHANGELOG FOR UHC
 
+## 1.7.1
+
+## ADDED
+
+- dynamic importing.
+
+## BUGS FIXED
+
+- class name regex bug.
+
 ## 1.7.0
 
 ## ADDED
