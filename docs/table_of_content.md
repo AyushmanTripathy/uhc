@@ -4,7 +4,7 @@
 1. [Component format](#component-format)
 1. [Importing](#importing)
 1. [Variables](#variables)
-1. [Conditional Flow](#conditional_flow)
+1. [Conditional Flow](#conditional-flow)
 1. [Loops](#loops)
 1. [Routes](#routes)
 1. [Template](#template)

@@ -4,7 +4,7 @@ the useful html compiler
 options
   -h : help
   -g : generate uhc.config.json
-  -c : load config (usage is not recommended)
+  -c : load custom config
   -w : watch dir
 
 commands
