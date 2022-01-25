@@ -3,6 +3,7 @@ import { resolve } from "path";
 import { grey } from "btss";
 import parseIndex from "./parser.js";
 import sass from "sass";
+import { minify } from "html-minifier";
 import postcss from "postcss";
 import autoprefixer from "autoprefixer";
 
@@ -11,6 +12,7 @@ export async function init() {
     await compile(config.routes);
     log(grey("compiled successfully!"));
   } catch (e) {
+    if (typeof e == "object") e = e.message;
     console.error(e);
     process.exit(1);
   }
@@ -44,23 +46,35 @@ async function compileRoute(from, to) {
   const from_dir = resolve(from, "../");
   let [html, css] = parseIndex(from);
 
-  if (config.css) {
-    css = css.replaceAll(/<\/style( )*>/g, "");
-    css = css.replaceAll(/<style(.||\n)[^<]*>/g, "");
+  css = css.replaceAll(/<\/style( )*>/g, "");
+  css = css.replaceAll(/<style(.||\n)[^<]*>/g, "");
+  if (typeof config.css == "object") {
     if (config.css.prefix) css = config.css.prefix + css;
-  } else error("css configs not found");
-
-  const id = "/bundle" + hash() + ".css";
-  const to_dir = resolve(to, "../");
+  } else {
+    warn("no config provided for css.");
+    config.css = {};
+  }
 
   // sass
   if (config.css.sass) {
     try {
-      css = sass.compileString(css, {
+      let options = {
         loadPaths: [from_dir],
-      }).css;
+      };
+      if (typeof config.css.sass == "object")
+        options = { ...options, ...config.css.sass };
+      css = sass.compileString(css, options);
+      if (css.sourceMap) {
+        const mapPath = to.replace(".html", ".css.map");
+        write(JSON.stringify(css.sourceMap), mapPath);
+        log(
+          grey("source map generated ") +
+            mapPath.match(/\/(.)[^\/]*\.css\.map/)[0].slice(1)
+        );
+      }
+      css = css.css;
     } catch (e) {
-      return console.error(e.message);
+      return error("sass error\n" + e.message);
     }
   }
 
@@ -70,16 +84,32 @@ async function compileRoute(from, to) {
   // postcss
   if (plugins.length) {
     try {
-      const res = await postcss(plugins).process(css, { from: id.slice(1) });
-      if (res.map) write(res.map, to_dir + id + ".map");
-      css = res.css;
+      css = await postcss(plugins).process(css, { from: undefined }).css;
     } catch (e) {
-      return console.error(e);
+      error("postcss error\n" + e.message);
     }
   }
+  html = html.replace("%head%", `<style>${css}</style>`);
 
-  //html
-  write(html.replace("%head%", `<style>${css}</style>`), to);
+  // minify
+  if (config.minify) {
+    const minifyOptions = {
+      collapseWhitespace: true,
+      removeComments: true,
+      removeOptionalTags: true,
+      removeRedundantAttributes: true,
+      removeScriptTypeAttributes: true,
+      removeEmptyAttributes: true,
+      removeTagWhitespace: true,
+      useShortDoctype: true,
+      minifyCSS: true,
+      minifJS: true,
+    };
+    if (typeof config.minify == "object")
+      for (const key in config.minify) minifyOptions[key] = config.minify[key];
+    html = minify(html, minifyOptions);
+  }
+  write(html, to);
 }
 
 export function loadConfig(config_path) {
@@ -88,7 +118,11 @@ export function loadConfig(config_path) {
   if (!existsSync(config_path))
     error(config_path + " doesn't exists. use -h to know more.");
 
-  globalThis.config = JSON.parse(readFileSync(config_path));
+  try {
+    globalThis.config = JSON.parse(readFileSync(config_path));
+  } catch (e) {
+    error(`error while parsing ${config_path}\n${e.message}`);
+  }
   checkVersion(config.uhc);
 
   if (!config.src_dir) error("src dir not specified!");

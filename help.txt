@@ -14,7 +14,7 @@ commands
 uhc <command>
 
 stuck? read the docs!
-  https://uhcjs.netlify.app/docs.html
+  https://github.com/AyushmanTripathy/uhc#documentation
 
 plz create an issue to report any bugs
 or recommend us features we should add.

@@ -1,5 +1,11 @@
 DONE
 ----
+minify output
+source map generation
+
 TODO
 ----
+
+importing svg
+total sorce map support
 fix live-server error

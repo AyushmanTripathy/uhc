@@ -50,7 +50,7 @@ function parse(path, vars = {}, index) {
   file = addClassName(file, class_name);
   if (config.statments != false) file = parseStatments(file, vars);
 
-  const temp = checkImports(file, vars, path);
+  const temp = checkImports(file, vars, path, class_name);
   temp[1] += css;
   temp[0] += js;
   return temp;
@@ -147,7 +147,7 @@ function run(code, context) {
   return context.x_;
 }
 
-function checkImports(file, variables, path) {
+function checkImports(file, variables, path, class_name) {
   const imports = file.match(new RegExp("<import (.||\n)[^>]*/>", "gi"));
   let css = "";
   if (imports) {
@@ -156,6 +156,7 @@ function checkImports(file, variables, path) {
       if (!vars.path) error("path not specified for import\n" + imp);
       if (!existsSync(import_path(vars.path, path)))
         error("no such file " + import_path(vars.path, path) + "\n" + imp);
+
       const [html, styles] = parse(import_path(vars.path, path), {
         ...vars,
         ...variables,

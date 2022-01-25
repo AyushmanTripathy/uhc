@@ -33,7 +33,7 @@ npm install uhc -g
 
 2. start a new project
 
-- use a template
+- use a skeleton uhc app.
 
 ```
 uhc init app_name
