@@ -3,6 +3,7 @@
   "src_dir": "src",
   "build_dir": "public",
   "template": "template.html",
+  "minify": true,
   "css": {
     "autoprefix": true,
     "prefix": "@import \"./global.scss\";",

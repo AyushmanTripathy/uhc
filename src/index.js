@@ -15,8 +15,15 @@ globalThis.hash = () => {
   hash_no += 1;
   return hash_no;
 };
-globalThis.error = (str) => {
-  throw red("[ERROR] ") + str;
+globalThis.error = (str, source) => {
+  let msg = red("[ERROR] ") + str;
+  if (source) {
+    source =
+      yellow("\n-------\nsource\n ") +
+      source.reverse().splice(0, 5).join("\n imported from ");
+    msg += source;
+  }
+  throw msg;
 };
 
 globalThis.version = loadJson("../package.json").version;
@@ -113,7 +120,7 @@ async function watchDir(path, compile) {
     output: process.stdout,
     terminal: true,
   }).on("line", (data) => {
-    if (data == "r") compile();
+    if (data == "r") compile(true);
     else if (data == "q") process.exit();
   });
 
@@ -127,7 +134,7 @@ async function watchDir(path, compile) {
     if (!compile_on_change) return;
     globalThis.template = readFileSync(resolve(src, config.template), "utf-8");
     log(green(event + " : " + basename(path)));
-    compile();
+    compile(true);
   });
 }
 

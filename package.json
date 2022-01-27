@@ -1,6 +1,6 @@
 {
   "name": "uhc",
-  "version": "1.7.1",
+  "version": "1.8.0",
   "description": "the useful html compiler",
   "main": "src/index.js",
   "type": "module",
@@ -22,7 +22,8 @@
     "btss": "1.1.0",
     "chokidar": "^3.5.2",
     "dotenv": "^10.0.0",
-    "live-server": "1.2.1",
+    "html-minifier": "^4.0.0",
+    "live-server": "^1.2.1",
     "postcss": "^8.4.5",
     "sass": "^1.45.0"
   }

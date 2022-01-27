@@ -1,48 +1,56 @@
 # CHANGELOG FOR UHC
 
+## 1.8.0
+
+#### ADDED
+
+- minify output
+- sources to errors
+- partial source map support
+
 ## 1.7.1
 
-## ADDED
+#### ADDED
 
 - dynamic importing.
 
-## BUGS FIXED
+#### BUGS FIXED
 
 - class name regex bug.
 
 ## 1.7.0
 
-## ADDED
+#### ADDED
 
 - check path before importing.
 - conditional flow
 - add javascript in ${}
 - loops
 
-## CHANGES
+#### CHANGES
 
 - parse script tags separate from html.
 - refresh template on recompile.
 
 ## 1.6.0
 
-## ADDED
+#### ADDED
 
 - init command
 - added %head% %body% in template
 
-## CHANGES
+#### CHANGES
 
 - removed template optional support.
 
 ## 1.5.0
 
-### ADDED
+#### ADDED
 
 - added version check
 - load environment vars
 
-### CHANGES
+#### CHANGES
 
 - reorganised init function into init, checkArgs and loadConfig.
 
@@ -52,15 +60,15 @@
 
 ## 1.4.0
 
-### ADDED
+#### ADDED
 
 - added dev mode
 
-### CHANGES
+#### CHANGES
 
 - replaced recursive-watch with chokidar
 
-### BUGS FIXED
+#### BUGS FIXED
 
 - fix pareIndex file refrence error
 

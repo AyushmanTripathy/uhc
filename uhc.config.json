@@ -1,15 +1,15 @@
 {
-  "uhc": "1.7.1",
+  "uhc": "1.8.0",
   "src_dir": "test",
   "build_dir": "build",
   "template": "template.html",
+  "minify": true,
   "css": {
     "autoprefix": true,
     "prefix": "@import \"./mixins.scss\";",
-    "sass": true
-  },
-  "vars": {
-    "foo": "bar"
+    "sass": {
+      "sourceMap": true
+    }
   },
   "routes": {
     "/": "index.html"
