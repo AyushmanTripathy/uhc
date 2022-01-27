@@ -7,14 +7,14 @@ import { minify } from "html-minifier";
 import postcss from "postcss";
 import autoprefixer from "autoprefixer";
 
-export async function init() {
+export async function init(watching) {
   try {
     await compile(config.routes);
     log(grey("compiled successfully!"));
   } catch (e) {
     if (typeof e == "object") e = e.message;
+    if (!watching) throw e;
     console.error(e);
-    process.exit(1);
   }
 }
 
@@ -94,6 +94,7 @@ async function compileRoute(from, to) {
   // minify
   if (config.minify) {
     const minifyOptions = {
+/*
       collapseWhitespace: true,
       removeComments: true,
       removeOptionalTags: true,
@@ -104,10 +105,16 @@ async function compileRoute(from, to) {
       useShortDoctype: true,
       minifyCSS: true,
       minifJS: true,
+
+      */
     };
     if (typeof config.minify == "object")
       for (const key in config.minify) minifyOptions[key] = config.minify[key];
-    html = minify(html, minifyOptions);
+    try {
+      html = minify(html, minifyOptions);
+    } catch (e) {
+      //error("minifer error\n"+ e.message);
+    }
   }
   write(html, to);
 }

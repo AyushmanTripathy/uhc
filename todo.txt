@@ -1,7 +1,5 @@
 DONE
 ----
-minify output
-source map generation
 
 TODO
 ----

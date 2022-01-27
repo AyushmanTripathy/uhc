@@ -1,5 +1,5 @@
 import { readFileSync, existsSync } from "fs";
-import { resolve } from "path";
+import { resolve, basename } from "path";
 import { runInContext, createContext } from "vm";
 
 export default function parseIndex(path) {
@@ -18,20 +18,22 @@ export default function parseIndex(path) {
     error("templates are no longer optional in 1.6.0 and higher.");
   } else {
     checkTemplate(template, config.template);
-    const temp = parse(path, config.vars, css + file);
+    const temp = parse(path, config.vars, [], css + file);
     file = temp[0];
     css = temp[1];
     file = template.replace("%body%", file);
     return [file, css];
   }
 }
-function parse(path, vars = {}, index) {
+function parse(path, vars = {}, source, index) {
   const class_name = "uhc" + hash();
+  source.push(basename(path));
   let file = index ? index : readFileSync(path, "utf-8");
   path = resolve(path, "../");
 
   //comments
-  if (config.comments != false) file = file.replaceAll(/\/\*(.||\n)*\*\//g, "");
+  if (config.comments != false)
+    file = file.replaceAll(/\/\*(.||\n)*\*\//g, "");
 
   let js = "";
   const scripts = file.match(
@@ -45,12 +47,13 @@ function parse(path, vars = {}, index) {
   }
 
   let css = "";
-  if (config.vars != false) file = parseBlock(file, vars);
   [file, css] = parseCss(file, class_name);
+  if (config.statments != false)
+    file = parseStatments(file, vars, source);
+  if (config.vars != false) file = parseBlock(file, vars, source);
   file = addClassName(file, class_name);
-  if (config.statments != false) file = parseStatments(file, vars);
 
-  const temp = checkImports(file, vars, path, class_name);
+  const temp = checkImports(file, vars, path, class_name, source);
   temp[1] += css;
   temp[0] += js;
   return temp;
@@ -65,9 +68,7 @@ function checkTemplate(file, path) {
   else if (head.length - 1) warn("multiple %head% found in " + path);
 }
 
-
-
-function parseStatments(file, vars) {
+function parseStatments(file, vars, source) {
   let matches = file.match(/\((.||\n)[^\(\)]*\)\s*{(.||\n)[^{}]*}/g);
   if (matches) {
     for (const loop of matches) {
@@ -76,7 +77,7 @@ function parseStatments(file, vars) {
       try {
         count = run(count, vars);
       } catch (e) {
-        error(`while executing (${count})\n ${e.message}`);
+        error(`while executing (${count})\n ${e.message}`, source);
       }
       if (Number(count)) content = content.repeat(count);
       else if (!count) content = "";
@@ -126,7 +127,7 @@ function parseCss(file, class_name) {
   return [file, css];
 }
 
-function parseBlock(file, vars) {
+function parseBlock(file, vars, source) {
   const statments = file.match(/\${(.||\n)[^}]*}/g);
   if (statments) {
     for (const statment of statments) {
@@ -134,7 +135,7 @@ function parseBlock(file, vars) {
       try {
         file = file.replace(statment, run(code, vars));
       } catch (e) {
-        error("while executing " + code + "\n" + e.message);
+        error("while executing " + code + "\n" + e.message, source);
       }
     }
   }
@@ -147,22 +148,35 @@ function run(code, context) {
   return context.x_;
 }
 
-function checkImports(file, variables, path, class_name) {
-  const imports = file.match(new RegExp("<import (.||\n)[^>]*/>", "gi"));
+function checkImports(file, variables, path, class_name, source) {
+  const imports = file.match(new RegExp("<import(.||\n)[^>]*/>", "gi"));
   let css = "";
+  let last_import;
   if (imports) {
     for (const imp of imports) {
       const vars = checkAttributes(imp);
-      if (!vars.path) error("path not specified for import\n" + imp);
+      if (!vars.path) {
+        if (!last_import)
+          error("path not specified for import\n" + imp, source);
+        else vars.path = last_import;
+      }
       if (!existsSync(import_path(vars.path, path)))
-        error("no such file " + import_path(vars.path, path) + "\n" + imp);
+        error(
+          "no such file " + import_path(vars.path, path) + "\n" + imp,
+          source
+        );
 
-      const [html, styles] = parse(import_path(vars.path, path), {
-        ...vars,
-        ...variables,
-      });
+      const [html, styles] = parse(
+        import_path(vars.path, path),
+        {
+          ...variables,
+          ...vars,
+        },
+        source.slice()
+      );
       css += styles;
       file = file.replace(imp, html);
+      last_import = vars.path;
     }
   }
   return [file, css];
