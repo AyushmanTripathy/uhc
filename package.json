@@ -1,6 +1,6 @@
 {
   "name": "uhc",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "the useful html compiler",
   "main": "src/index.js",
   "type": "module",
@@ -16,6 +16,7 @@
     "css",
     "compiler"
   ],
+  "homepage": "https://github.com/AyushmanTripathy/uhc",
   "license": "MIT",
   "dependencies": {
     "autoprefixer": "^10.4.0",
@@ -23,7 +24,6 @@
     "chokidar": "^3.5.2",
     "dotenv": "^10.0.0",
     "html-minifier": "^4.0.0",
-    "live-server": "^1.2.1",
     "postcss": "^8.4.5",
     "sass": "^1.45.0"
   }

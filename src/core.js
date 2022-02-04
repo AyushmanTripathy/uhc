@@ -7,7 +7,7 @@ import { minify } from "html-minifier";
 import postcss from "postcss";
 import autoprefixer from "autoprefixer";
 
-export async function init(watching) {
+export default async function (watching) {
   try {
     await compile(config.routes);
     log(grey("compiled successfully!"));
@@ -48,6 +48,7 @@ async function compileRoute(from, to) {
 
   css = css.replaceAll(/<\/style( )*>/g, "");
   css = css.replaceAll(/<style(.||\n)[^<]*>/g, "");
+
   if (typeof config.css == "object") {
     if (config.css.prefix) css = config.css.prefix + css;
   } else {
@@ -94,7 +95,6 @@ async function compileRoute(from, to) {
   // minify
   if (config.minify) {
     const minifyOptions = {
-/*
       collapseWhitespace: true,
       removeComments: true,
       removeOptionalTags: true,
@@ -105,15 +105,13 @@ async function compileRoute(from, to) {
       useShortDoctype: true,
       minifyCSS: true,
       minifJS: true,
-
-      */
     };
     if (typeof config.minify == "object")
       for (const key in config.minify) minifyOptions[key] = config.minify[key];
     try {
       html = minify(html, minifyOptions);
     } catch (e) {
-      //error("minifer error\n"+ e.message);
+      error(e.message);
     }
   }
   write(html, to);
