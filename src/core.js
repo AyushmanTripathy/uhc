@@ -111,7 +111,7 @@ async function compileRoute(from, to) {
     try {
       html = minify(html, minifyOptions);
     } catch (e) {
-      error(e.message);
+      error("minifer error\n"+ e.message);
     }
   }
   write(html, to);
