@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 
-import { bold, red, green, yellow } from "btss";
+import { cyan, bold, red, green, yellow } from "btss";
 import { exec } from "child_process";
 import { rm, writeFile, readFileSync } from "fs";
-
 import dotenv from "dotenv";
 
 globalThis.hash_no = 0;
@@ -18,7 +17,7 @@ globalThis.error = (str, source) => {
   let msg = red("[ERROR] ") + str;
   if (source) {
     source =
-      yellow("\n-------\nsource\n ") +
+      cyan("\nsource ") +
       source.reverse().splice(0, 5).join("\n imported from ");
     msg += source;
   }

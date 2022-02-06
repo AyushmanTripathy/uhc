@@ -104,7 +104,7 @@ async function compileRoute(from, to) {
       removeTagWhitespace: true,
       useShortDoctype: true,
       minifyCSS: true,
-      minifJS: true,
+      minifyJS: true,
     };
     if (typeof config.minify == "object")
       for (const key in config.minify) minifyOptions[key] = config.minify[key];
