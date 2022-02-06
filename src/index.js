@@ -1,11 +1,8 @@
 #!/usr/bin/env node
 
-import { bold, red, green, yellow } from "btss";
-import { createInterface } from "readline";
+import { cyan, bold, red, green, yellow } from "btss";
 import { exec } from "child_process";
-import { resolve, basename } from "path";
-import { rm, existsSync, writeFile, readFileSync } from "fs";
-
+import { rm, writeFile, readFileSync } from "fs";
 import dotenv from "dotenv";
 
 globalThis.hash_no = 0;
@@ -15,11 +12,12 @@ globalThis.hash = () => {
   hash_no += 1;
   return hash_no;
 };
+
 globalThis.error = (str, source) => {
   let msg = red("[ERROR] ") + str;
   if (source) {
     source =
-      yellow("\n-------\nsource\n ") +
+      cyan("\nsource ") +
       source.reverse().splice(0, 5).join("\n imported from ");
     msg += source;
   }
@@ -43,7 +41,7 @@ async function init() {
     else if (temp != 1) config_path = temp;
 
     if (!words.length) {
-      const { init: compile, loadConfig } = await import("./core.js");
+      const { default: compile, loadConfig } = await import("./core.js");
       loadConfig(config_path);
       await compile();
     } else await checkCommands(words, config_path);
@@ -62,10 +60,8 @@ async function checkArgs(options, config_path) {
         config_path = options[option] == true ? config_path : options[option];
         return config_path;
       case "w":
-        const { init: compile, loadConfig } = await import("./core.js");
-        if (options[option] == true) error("watch path required");
-        loadConfig(config_path);
-        return await watchDir(options[option], compile);
+        const { compileOnChange } = await import("./dev.js");
+        return compileOnChange(options[option], true, config_path);
       case "h":
         return help();
       default:
@@ -78,18 +74,8 @@ async function checkArgs(options, config_path) {
 async function checkCommands(words, config_path) {
   switch (words[0]) {
     case "dev":
-      const { init: compile, loadConfig } = await import("./core.js");
-      loadConfig(config_path);
-      const port = process.env.PORT || 8080;
-      const { default: liveServer } = await import("live-server");
-      liveServer.start({
-        port: port,
-        root: build,
-        file: ".",
-        open: false,
-        logLevel: 2,
-      });
-      return await watchDir(src, compile);
+      const { default: dev } = await import("./dev.js");
+      return await dev(config_path);
     case "init":
       const name = words[1] || "uhc-app";
       return exec(
@@ -109,33 +95,6 @@ async function checkCommands(words, config_path) {
     default:
       error("unknown command " + words[0]);
   }
-}
-
-async function watchDir(path, compile) {
-  if (!existsSync(path)) error(path + " path doesn't exits");
-  log(green('"r" to recompile or "q" to quit'));
-
-  createInterface({
-    input: process.stdin,
-    output: process.stdout,
-    terminal: true,
-  }).on("line", (data) => {
-    if (data == "r") compile(true);
-    else if (data == "q") process.exit();
-  });
-
-  let compile_on_change = false;
-  setTimeout(() => {
-    compile_on_change = true;
-  }, 500);
-
-  const { watch } = await import("chokidar");
-  watch(path).on("all", (event, path) => {
-    if (!compile_on_change) return;
-    globalThis.template = readFileSync(resolve(src, config.template), "utf-8");
-    log(green(event + " : " + basename(path)));
-    compile(true);
-  });
 }
 
 function loadJson(path) {

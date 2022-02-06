@@ -1,4 +1,4 @@
-<img src="https://github.com/AyushmanTripathy/uhc/blob/release/icon.png" alt="UTC icon"/>
+![UHC icon](./icon.png)
 
 UHC, the useful html compiler, for when you don't need a javascript framework.
 

@@ -1,9 +1,19 @@
 DONE
 ----
+fix live-server error
 
 TODO
 ----
 
-importing svg
+<loop 90> 
+  <section></section>
+</loop>
+
+importing svg files.
+  <import path="logo.svg" type="svg"/>
+
 total sorce map support
-fix live-server error
+
+fix error
+  uhc -w src/ -c config.json
+  watch option before config.
