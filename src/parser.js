@@ -48,8 +48,7 @@ function parse(path, vars = {}, source, index) {
 
   let css = "";
   [file, css] = parseCss(file, class_name);
-  if (config.statments != false)
-    file = parseStatments(file, vars, source);
+  if (config.statments != false) file = parseStatments(file, vars, source);
   if (config.vars != false) file = parseBlock(file, vars, source);
   file = addClassName(file, class_name);
 
@@ -142,6 +141,16 @@ function parseBlock(file, vars, source) {
   return file;
 }
 
+function parseSvg(path, vars) {
+  let file = readFileSync(path, "utf-8");
+  const ignore = ["type", "path"];
+  for (const key in vars) {
+    if (!ignore.includes(key))
+      file = file.replace("<svg", `<svg ${key}="${vars[key]}"`);
+  }
+  return file;
+}
+
 function run(code, context) {
   createContext(context);
   runInContext(`x_=${code}`, context);
@@ -160,22 +169,29 @@ function checkImports(file, variables, path, class_name, source) {
           error("path not specified for import\n" + imp, source);
         else vars.path = last_import;
       }
-      if (!existsSync(import_path(vars.path, path)))
+      const importPath = import_path(vars.path, path, vars.type);
+      if (!existsSync(importPath))
         error(
-          "no such file " + import_path(vars.path, path) + "\n" + imp,
+          `no such file ${importPath}\n${imp}`,
           source
         );
-
-      const [html, styles] = parse(
-        import_path(vars.path, path),
-        {
-          ...variables,
-          ...vars,
-        },
-        source.slice()
-      );
-      css += styles;
-      file = file.replace(imp, html);
+      if (vars.type == "svg") {
+        file = file.replace(
+          imp,
+          parseSvg(importPath, vars)
+        );
+      } else {
+        const [html, styles] = parse(
+          importPath,
+          {
+            ...variables,
+            ...vars,
+          },
+          source.slice()
+        );
+        css += styles;
+        file = file.replace(imp, html);
+      }
       last_import = vars.path;
     }
   }
@@ -185,16 +201,20 @@ function checkImports(file, variables, path, class_name, source) {
 function checkAttributes(tag) {
   const attributes = tag.match(/[a-z]+="(\n||.)[^"]*"/gi);
   const vars = {};
+  vars.class = "";
   if (attributes) {
     for (let attribute of attributes) {
       attribute = attribute.slice(0, -1).split('="');
-      vars[attribute[0]] = attribute[1];
+      if (attribute[0] == "class") vars.class += attribute[1];
+      else vars[attribute[0]] = attribute[1];
     }
   }
   return vars;
 }
 
-function import_path(path, src) {
-  path = path.endsWith(".html") ? path : path + ".html";
+function import_path(path, src, type) {
+  if (!type) type = "html"
+  type = "." + type;
+  path = path.endsWith(type) ? path : path + type;
   return resolve(src, path);
 }

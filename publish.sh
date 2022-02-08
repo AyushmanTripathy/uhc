@@ -22,10 +22,9 @@ update-npm
 
 echo "publishing"
 npm publish || error 'publishing error'
-
 git push origin master || error 'pushing to origin error'
-
 merge-master-release uhc || error "merge error"
+
 echo "merge complete"
 
 echo 'successfully published'
