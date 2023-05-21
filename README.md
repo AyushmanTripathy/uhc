@@ -110,12 +110,13 @@ plz create an [issue](https://github.com/AyushmanTripathy/uhc/issues) to report 
 
 ### options
 
-| option | function                 |
-| ------ | ------------------------ |
-| h      | help                     |
-| g      | generate uhc.config.json |
-| c      | load custion config file |
-| w      | watch path               |
+| option | function                   |
+| ------ | -------------------------- |
+| h      | help                       |
+| g      | generate uhc.config.json   |
+| c      | load custion config file   |
+| w      | watch path                 |
+| v      | show dependencies verisons |
 
 ### Commands
 

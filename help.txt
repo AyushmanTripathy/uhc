@@ -6,6 +6,7 @@ options
   -g : generate uhc.config.json
   -c : load custom config
   -w : watch dir and recompile on changes
+  -v : shows version of dependencies
 
 commands
   dev : watch src dir, recompile on changes with live-server.

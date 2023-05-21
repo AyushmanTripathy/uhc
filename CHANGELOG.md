@@ -1,8 +1,15 @@
 # CHANGELOG FOR UHC
 
+## 2.0.1
+
+#### ADDED
+
+- version `-v` option
+
 ## 2.0.0
 
-#### ADDED 
+#### ADDED
+
 - own live server.
 - importing svg files.
 

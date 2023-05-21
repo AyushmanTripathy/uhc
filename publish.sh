@@ -15,9 +15,6 @@ read null
 echo 'commit version code'
 read null
 
-echo "compiling docs"
-sh docs/compile.sh
-
 update-npm
 
 echo "publishing"

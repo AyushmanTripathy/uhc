@@ -24,7 +24,8 @@ globalThis.error = (str, source) => {
   throw msg;
 };
 
-globalThis.version = loadJson("../package.json").version;
+globalThis.packageJson = loadJson("../package.json");
+globalThis.version = packageJson.version;
 
 init();
 async function init() {
@@ -54,6 +55,8 @@ async function init() {
 async function checkArgs(options, config_path) {
   for (const option in options) {
     switch (option) {
+      case "v":
+        return showVersions();
       case "g":
         return generateConfig();
       case "c":
@@ -131,6 +134,12 @@ function generateConfig() {
     if (e) error("couldn't write to " + path);
     else log(green("uhc.config.json generated"));
   });
+}
+
+function showVersions() {
+  for (const dep in packageJson.dependencies) {
+    log(`${dep}: ${packageJson.dependencies[dep]}`);
+  }
 }
 
 function help() {
