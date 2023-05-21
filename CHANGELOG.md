@@ -1,5 +1,28 @@
 # CHANGELOG FOR UHC
 
+## 2.0.1
+
+#### ADDED
+
+- version `-v` option
+
+## 2.0.0
+
+#### ADDED
+
+- own live server.
+- importing svg files.
+
+## 1.9.0
+
+#### ADDED
+
+- added dev.js
+
+#### CHANGES
+
+- replaced live-server with websockets.
+
 ## 1.8.0
 
 #### ADDED

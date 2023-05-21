@@ -32,16 +32,18 @@ export default function (config_path) {
       } else {
         res.writeHead(200, { "Content-Type": "text/html" });
         let file = readFileSync(filePath, "utf-8");
-        file = file.replace(
-          "</body>",
-          `<script defer>
+        const js = `<script defer>
           const ws = new WebSocket("ws://localhost:${ws_port}");
-          console.log("UHC dev")
+          console.log("%cUHC watching...",'font-weight: 800;')
           ws.addEventListener('message', ({ data }) => {
             if(data == "reload") window.location.reload();
           });
-          </script></body>`
-        );
+          </script>`;
+        if (file.includes("</body>"))
+          file = file.replace("</body>", js + "</body>");
+        else if (file.includes("</html>"))
+          file = file.replace("</html>", js + "</html>");
+        else file += js;
         res.end(file);
       }
     } catch (e) {
@@ -49,9 +51,7 @@ export default function (config_path) {
       res.end("Internal Server Error\n" + e);
     }
   });
-  server.listen(port, () =>
-    log(cyan("Serving on http://localhost:" + port))
-  );
+  server.listen(port, () => log(cyan("Serving on http://localhost:" + port)));
 
   const wss = new WebSocketServer({ port: ws_port });
   watchDir(

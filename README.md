@@ -1,4 +1,4 @@
-![UHC icon](./icon.png)
+![UHC](./icon.png)
 
 UHC, the useful html compiler, for when you don't need a javascript framework.
 
@@ -110,12 +110,13 @@ plz create an [issue](https://github.com/AyushmanTripathy/uhc/issues) to report 
 
 ### options
 
-| option | function                 |
-| ------ | ------------------------ |
-| h      | help                     |
-| g      | generate uhc.config.json |
-| c      | load custion config file |
-| w      | watch path               |
+| option | function                   |
+| ------ | -------------------------- |
+| h      | help                       |
+| g      | generate uhc.config.json   |
+| c      | load custion config file   |
+| w      | watch path                 |
+| v      | show dependencies verisons |
 
 ### Commands
 
@@ -159,6 +160,15 @@ plz create an [issue](https://github.com/AyushmanTripathy/uhc/issues) to report 
 
 ```html
 <import path="./component" />
+```
+
+- import svg using type attribute.
+- the imported svg can be styled from the parent component.
+- you can pass attributes to svg from th import tag.
+- in this example, svg will get a id attribute.
+
+```html
+<import path="./logo.svg" type="svg" id="logo" />
 ```
 
 ## Variables
@@ -226,7 +236,7 @@ plz create an [issue](https://github.com/AyushmanTripathy/uhc/issues) to report 
 | url                            | html          |
 | ------------------------------ | ------------- |
 | website.com/                   | index.html    |
-| website.com/project            | project.html  |
+| website.com/project/           | project.html  |
 | website.com/project/table.html | table.html    |
 | website.com/settings.html      | settings.html |
 
