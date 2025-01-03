@@ -4,6 +4,14 @@ DONE
 TODO
 ----
 
+http://localhost:8080/commitee 
+  live server code not being injected
+  because it doesnot end with html
+
+passing down attributes from import tag
+
+for similar type of component dont add same styles repeatedly
+
 <loop 90> 
   <section></section>
 </loop>
